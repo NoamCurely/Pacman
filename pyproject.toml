@@ -1,0 +1,25 @@
+[project]
+name = "Pacman"
+version = "0.1.0"
+description = "Pacman"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic",
+    "flake8",
+	"mazegenerator",
+	"pygame"
+]
+
+[tool.mypy]
+exclude = ['^\\.venv/']
+explicit_package_bases = true
+python_executable = ".venv/bin/python"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.1.0",
+    "pytest>=9.0.3",
+]
+
+[tool.uv.sources]
+mazegenerator = { path = "mazegenerator-2.0.2-py3-none-any.whl" }

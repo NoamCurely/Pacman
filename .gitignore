@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# Type / lint caches
+.mypy_cache/
+
+# for nixos with niri
+shell.nix
+.envrc

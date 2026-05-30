@@ -1,0 +1,27 @@
+# Pacman config file
+# Lines starting with # are comments and are ignored by parser
+
+{
+  "highscore_filename": "data/output/highscores.json",
+  "lives": 3,
+  "pacgum": 42,
+  "points_per_pacgum": 10,
+  "points_per_super_pacgum": 50,
+  "points_per_ghost": 200,
+  "seed": 42,
+  "level_max_time": 90,
+
+  # level array — 10 levels, width/height grow with difficulty
+  "levels": [
+    { "width": 21, "height": 21 },
+    { "width": 23, "height": 21 },
+    { "width": 25, "height": 23 },
+    { "width": 27, "height": 25 },
+    { "width": 29, "height": 27 },
+    { "width": 31, "height": 27 },
+    { "width": 33, "height": 29 },
+    { "width": 35, "height": 31 },
+    { "width": 37, "height": 33 },
+    { "width": 39, "height": 35 }
+  ]
+}
