@@ -3,6 +3,7 @@ from src.fonts import Fonts
 from src.parsing import Config
 from src.scenes.menu import Menu
 from src.scenes.scene import Scene
+from src.ui.confirm import ConfirmDialog
 
 
 class Custom(Menu):
@@ -23,14 +24,19 @@ class Custom(Menu):
         ]
         self.options = [(f, None) for f in self.fields]
         self.draft = {k: getattr(config, k) for k in self.fields}
-        self.start_y = 120
-        self.step = 70
-        self.value_font = pygame.font.Font(None, 60)
-        self.hint_size = 28
+        h = screen_rect.height
+        self.start_y = round(h * 120 / 720)
+        self.step = round(h * 70 / 720)
+        self.value_font = pygame.font.Font(None, round(h * 60 / 720))
+        self.hint_size = round(h * 28 / 720)
         self.hint_font = pygame.font.SysFont("dejavusans", self.hint_size)
         self.hint_font_bold = pygame.font.SysFont(
             "dejavusans", self.hint_size, bold=True)
         self.confirming = False
+        self.dialog = ConfirmDialog(self.font, self.hint_font)
+        # auto-répétition des touches maintenues (global pygame)
+        pygame.key.set_repeat(350, 60)
+        self.enter_held = False  # bloque répétition d'ENTER
         self.keymap[pygame.K_RIGHT] = lambda: self.adjust(1)
         self.keymap[pygame.K_LEFT] = lambda: self.adjust(-1)
         self.keymap[pygame.K_RETURN] = self.ask_confirm
@@ -40,6 +46,16 @@ class Custom(Menu):
             pygame.K_RETURN: self.do_save,
             pygame.K_ESCAPE: self.cancel,
         }
+
+    def handle_event(self, event: pygame.event.Event) -> None:
+        if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
+            self.enter_held = False
+            return
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if self.enter_held:
+                return  # ignore répétition d'ENTER
+            self.enter_held = True
+        super().handle_event(event)
 
     def adjust(self, delta: int) -> None:
         key = self.fields[self.selected]
@@ -59,8 +75,12 @@ class Custom(Menu):
         for k, v in self.draft.items():
             setattr(self.config, k, v)
         self.cancel()
+        pygame.key.set_repeat()  # coupe répétition en sortant
+        from src.scenes.game import Game
+        self.next_scene = Game(self.fonts, self.screen_rect, self.config)
 
     def back(self) -> None:
+        pygame.key.set_repeat()  # coupe répétition en sortant
         self.next_scene = self.previous
 
     def draw(self, screen: pygame.Surface) -> None:
@@ -77,8 +97,9 @@ class Custom(Menu):
             y = self.start_y + i * self.step
             name_rect = name.get_rect(center=(cx, y))
             screen.blit(name, name_rect)
+            gap = round(self.screen_rect.height * 15 / 720)
             val_rect = val.get_rect(
-                midleft=(name_rect.right + 15, name_rect.centery))
+                midleft=(name_rect.right + gap, name_rect.centery))
             screen.blit(val, val_rect)
 
         key_color = (140, 140, 140)
@@ -89,8 +110,9 @@ class Custom(Menu):
             ("ENTER", "valid"),
             ("ESC", "back"),
         ]
-        key_gap = 8     # entre touche et son mot
-        group_gap = 28  # entre deux groupes
+        h = self.screen_rect.height
+        key_gap = round(h * 8 / 720)     # entre touche et son mot
+        group_gap = round(h * 28 / 720)  # entre deux groupes
         # pré-rend (touche bold, mot normal) par groupe
         rendered = [
             (self.hint_font_bold.render(k, True, key_color),
@@ -101,7 +123,7 @@ class Custom(Menu):
                     for ks, ts in rendered)
         total += group_gap * (len(rendered) - 1)
         x = cx - total // 2
-        y = self.screen_rect.bottom - 40
+        y = self.screen_rect.bottom - round(h * 40 / 720)
         for ks, ts in rendered:
             screen.blit(ks, (x, y - ks.get_height() // 2))
             x += ks.get_width() + key_gap
@@ -109,9 +131,5 @@ class Custom(Menu):
             x += ts.get_width() + group_gap
 
         if self.confirming:
-            box = self.font.render("SAVE CONFIG?", True, "yellow")
-            screen.blit(box, box.get_rect(center=self.screen_rect.center))
-            ask = self.hint_font.render(
-                "ENTER = yes     ESC = no", True, (200, 200, 200))
-            screen.blit(ask, ask.get_rect(
-                center=(cx, self.screen_rect.centery + 50)))
+            self.dialog.draw(screen, self.screen_rect,
+                             "SAVE CONFIG?", "ENTER     ESC ")

@@ -14,8 +14,9 @@ class Landing(Scene):
         self.screen_rect = screen_rect
         self.config = config
 
-        title_font = fonts.get("Pacmania.otf", 74)
-        prompt_font = fonts.get("Pacmania.otf", 32)
+        h = screen_rect.height
+        title_font = fonts.get("Pacmania.otf", round(h * 74 / 720))
+        prompt_font = fonts.get("Pacmania.otf", round(h * 32 / 720))
 
         self.title = title_font.render("PAC-MAN", True, "yellow")
         self.title_rect = self.title.get_rect(center=screen_rect.center)
@@ -23,7 +24,8 @@ class Landing(Scene):
         self.prompt = prompt_font.render(
             "PRESS ENTER TO START", True, (200, 200, 200))
         self.prompt_rect = self.prompt.get_rect(
-            center=(screen_rect.centerx, screen_rect.centery + 100))
+            center=(screen_rect.centerx,
+                    screen_rect.centery + round(h * 100 / 720)))
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:

@@ -11,8 +11,10 @@ class Launch:
 
     def menu(self) -> None:
         pygame.init()
+        info = pygame.display.Info()
         screen = pygame.display.set_mode(
-            (1280, 720), pygame.SCALED | pygame.FULLSCREEN)
+            (info.current_w, info.current_h),
+            pygame.SCALED | pygame.FULLSCREEN)
         clock = pygame.time.Clock()
 
         fonts = Fonts()

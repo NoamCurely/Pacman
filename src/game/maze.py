@@ -2,7 +2,9 @@ import pygame
 
 from mazegenerator import MazeGenerator
 
-WALL_COLOR = (33, 33, 222)
+# Couleur du fond, des murs (blanc) et épaisseur du trait en pixels.
+BG_COLOR = (25, 25, 30)
+WALL_COLOR = (240, 240, 240)
 WALL_W = 4
 
 
@@ -13,11 +15,13 @@ class Maze:
         self.rows = len(self.grid)
         self.cols = len(self.grid[0])
 
-    def draw(self, screen: pygame.Surface) -> None:
-        screen_w, screen_h = screen.get_size()
-        cell_size = min(screen_w // self.cols, screen_h // self.rows)
-        offset_x = (screen_w - self.cols * cell_size) // 2
-        offset_y = (screen_h - self.rows * cell_size) // 2
+    def draw(self, screen: pygame.Surface,
+             area: pygame.Rect | None = None) -> None:
+        if area is None:
+            area = screen.get_rect()
+        cell_size = min(area.width // self.cols, area.height // self.rows)
+        offset_x = area.x + (area.width - self.cols * cell_size) // 2
+        offset_y = area.y + (area.height - self.rows * cell_size) // 2
 
         for y in range(self.rows):
             for x in range(self.cols):
@@ -42,3 +46,6 @@ class Maze:
                 if west:
                     pygame.draw.line(screen, WALL_COLOR,
                                      (left, top), (left, bottom), WALL_W)
+                if v == 15:
+                    pygame.draw.rect(screen, (60, 90, 200),
+                                     (left, top, cell_size, cell_size))
