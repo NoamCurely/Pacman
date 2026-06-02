@@ -63,14 +63,42 @@ def load_ghost(sheet: SpriteSheet, color: str) -> dict[str, list]:
     return out
 
 
-# Petit Pac-Man: 2 frames (bouche) sur la bande y=48, origine x=4, pitch 16.
+# Petit Pac-Man directionnel.
+# Origine x=4, pitch 16. Par direction: 2 frames (bouche grande, bouche mi).
+# Le cercle fermé (bouche close) est unique et partagé par toutes les dirs.
 PACMAN_X0 = 4
-PACMAN_Y = 48
+PACMAN_OPEN_X = (4, 20)        # (grande ouverte, mi-ouverte)
+PACMAN_CLOSED_RECT = (36, 0, TILE, TILE)  # cercle plein partagé
+
+# y de la ligne de chaque direction (mouvement de la bouche).
+PACMAN_ROWS = {
+    "left": 0,
+    "right": 16,
+    "down": 32,
+    "up": 48,
+}
 
 
-def load_pacman(sheet: SpriteSheet) -> list[pygame.Surface]:
-    """Frames du petit Pac-Man (bouche ouverte/fermée)."""
-    return sheet.row(PACMAN_X0, PACMAN_Y, 2)
+def load_pacman_closed(sheet: SpriteSheet) -> pygame.Surface:
+    """Cercle plein (bouche fermée), partagé par toutes les directions."""
+    return sheet.at(*PACMAN_CLOSED_RECT)
+
+
+def load_pacman_dir(sheet: SpriteSheet, direction: str) -> list[pygame.Surface]:
+    """Cycle d'anim d'une direction: [fermé, mi-ouvert, grand ouvert].
+
+    Boucler ce cycle (et son retour) donne le chomp classique.
+    """
+    y = PACMAN_ROWS[direction]
+    closed = load_pacman_closed(sheet)
+    half = sheet.at(PACMAN_OPEN_X[1], y)
+    wide = sheet.at(PACMAN_OPEN_X[0], y)
+    return [closed, half, wide]
+
+
+def load_pacman(sheet: SpriteSheet) -> dict[str, list[pygame.Surface]]:
+    """Toutes les directions: {dir: [fermé, mi, grand]}."""
+    return {d: load_pacman_dir(sheet, d) for d in PACMAN_ROWS}
 
 
 # Pastilles, blobs #FFB7AE. Tuiles 16px centrées sur le contenu.
