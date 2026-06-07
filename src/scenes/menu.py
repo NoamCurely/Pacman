@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pygame
 from src.fonts import Fonts
 from src.parsing import Config
@@ -13,12 +15,11 @@ class Menu(Scene):
         self.fonts = fonts
         self.screen_rect = screen_rect
         self.config = config
-        h = screen_rect.height
-        self.font = fonts.get("Pacmania.otf", round(h * 48 / 720))
+        self.font = fonts.get("Pacmania.otf", 48)
         self.selected = 0
-        self.options: list[tuple[str, object]] = []
-        self.start_y = round(h * 200 / 720)
-        self.step = round(h * 80 / 720)
+        self.options: list[tuple[str, Callable[[], None] | None]] = []
+        self.start_y = 200
+        self.step = 80
         self.keymap = {
             pygame.K_DOWN: lambda: self.move(1),
             pygame.K_UP: lambda: self.move(-1),
@@ -50,3 +51,7 @@ class Menu(Scene):
         action = self.keymap.get(event.key)
         if action:
             action()
+
+    @staticmethod
+    def restrict() -> None:
+        pass

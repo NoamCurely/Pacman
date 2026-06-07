@@ -10,7 +10,12 @@ class Launch:
         self.config = config
 
     def menu(self) -> None:
+        try:
+            pygame.mixer.pre_init(44100, -16, 2, 512)
+        except (pygame.error, NotImplementedError):
+            pass  # pas d'audio (système headless) -> on continue muet
         pygame.init()
+        pygame.mouse.set_visible(False)
         info = pygame.display.Info()
         screen = pygame.display.set_mode(
             (info.current_w, info.current_h),

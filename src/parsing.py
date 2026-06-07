@@ -51,8 +51,10 @@ class Config(BaseModel):
     @classmethod
     def must_be_positive(cls, v: int, info: ValidationInfo) -> int:
         if v <= 0:
-            default = DEFAULTS[info.field_name]
-            print(f"Warning: {info.field_name}={v} invalid, using {default}")
+            name = info.field_name
+            assert name is not None
+            default = DEFAULTS[name]
+            print(f"Warning: {name}={v} invalid, using {default}")
             return default
         return v
 
@@ -63,6 +65,7 @@ class ParsingError(Exception):
 
 class Parsing:
     """Parses config files and returns validated Config."""
+
     def __init__(self, file: str) -> None:
         """Initialize parser with config file path."""
         self.file = file

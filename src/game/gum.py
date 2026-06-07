@@ -1,39 +1,73 @@
+import pygame
+import random
+
 from src.game.maze import Maze
 from src.parsing import Config
 
+GUM_COLOR = (255, 184, 151)
+SUPER_COLOR = (255, 230, 180)
+
 
 class Gum:
-    def __init__(self, maze: Maze, config: Config) -> None:
-        self.gum = set[tuple[int, int]] = set()
-        self.super_gum = set[tuple[int, int]] = set()
+    def __init__(
+        self,
+        maze: Maze,
+        config: Config,
+        ghost_spawns: set[tuple[int, int]],
+        player_spawn: tuple[int, int]
+    ) -> None:
+        self.gum: set[tuple[int, int]] = set()
+        self.super_gum: set[tuple[int, int]] = set()
+        self.ghost_spawns = ghost_spawns
+        self.player_spawn = player_spawn
+        self.points_pacgum = config.points_per_pacgum
+        self.points_super = config.points_per_super_pacgum
         self.place(maze, config)
 
-    def cornes_cell(self, maze: Maze):
-        pass
+    def place(self, maze: Maze, config: Config) -> None:
+        """Pose les supers aux coins + config.pacgum pacgums aléatoires."""
+        corners = maze.corner_cells()
+        skip = self.ghost_spawns | {self.player_spawn}
 
-    def place(self, maze: Maze, config: Config):
-        corners = self.cornes_cell(maze)
+        candidates = []
         for y in range(maze.rows):
             for x in range(maze.cols):
                 cell = (x, y)
                 if maze.grid[y][x] == 15:
                     continue
-                if maze.is_wall(cell):
-                    continue
-                if cell in self.ghost_spawn:
-                    continue
                 if cell in corners:
                     self.super_gum.add(cell)
-                elif:
-                    self.gum.add(cell)
+                    continue
+                if cell in skip:
+                    continue
+                candidates.append(cell)
 
-    def eat(self, cell) -> int:
-        pass
+        wanted_count = min(config.pacgum, len(candidates))
+        picker = random.Random(config.seed)
+        self.gum = set(picker.sample(candidates, wanted_count))
+
+    def eat(self, cell: tuple[int, int]) -> int:
+        if cell in self.gum:
+            self.gum.discard(cell)
+            return self.points_pacgum
+        if cell in self.super_gum:
+            self.super_gum.discard(cell)
+            # self.ghosts.set_frightened()
+            return self.points_super
+        return 0
 
     def remaining(self) -> int:
-        pass
+        return len(self.gum)
 
-    def draw(self, screen, area, cell_size, sprites):
-        pass
-
-    
+    def draw(self, screen: pygame.Surface, area: pygame.Rect,
+             maze: Maze) -> None:
+        """Draw remaining pacgums and super-pacgums."""
+        size = maze.cell_size(area)
+        r = max(2, size // 10)
+        big_r = max(4, size // 6)
+        for col, row in self.gum:
+            cx, cy = maze.cell_center(col, row, area)
+            pygame.draw.circle(screen, GUM_COLOR, (cx, cy), r)
+        for col, row in self.super_gum:
+            cx, cy = maze.cell_center(col, row, area)
+            pygame.draw.circle(screen, SUPER_COLOR, (cx, cy), big_r)

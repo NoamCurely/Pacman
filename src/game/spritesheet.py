@@ -53,11 +53,12 @@ GHOST_ROWS = {
 GHOST_DIRS = ("right", "down", "left", "up")
 
 
-def load_ghost(sheet: SpriteSheet, color: str) -> dict[str, list]:
+def load_ghost(sheet: SpriteSheet,
+               color: str) -> dict[str, list[pygame.Surface]]:
     """Frames d'un fantôme par direction: {dir: [frame0, frame1]}."""
     y = GHOST_ROWS[color]
     frames = sheet.row(GHOST_X0, y, 8)
-    out: dict[str, list] = {}
+    out: dict[str, list[pygame.Surface]] = {}
     for i, d in enumerate(GHOST_DIRS):
         out[d] = [frames[i * 2], frames[i * 2 + 1]]
     return out
@@ -72,10 +73,10 @@ PACMAN_CLOSED_RECT = (36, 0, TILE, TILE)  # cercle plein partagé
 
 # y de la ligne de chaque direction (mouvement de la bouche).
 PACMAN_ROWS = {
-    "left": 0,
-    "right": 16,
-    "down": 32,
-    "up": 48,
+    "right": 0,
+    "left": 16,
+    "up": 32,
+    "down": 48,
 }
 
 
@@ -84,7 +85,8 @@ def load_pacman_closed(sheet: SpriteSheet) -> pygame.Surface:
     return sheet.at(*PACMAN_CLOSED_RECT)
 
 
-def load_pacman_dir(sheet: SpriteSheet, direction: str) -> list[pygame.Surface]:
+def load_pacman_dir(sheet: SpriteSheet,
+                    direction: str) -> list[pygame.Surface]:
     """Cycle d'anim d'une direction: [fermé, mi-ouvert, grand ouvert].
 
     Boucler ce cycle (et son retour) donne le chomp classique.
@@ -114,3 +116,16 @@ def load_pacgum(sheet: SpriteSheet) -> pygame.Surface:
 def load_supergum(sheet: SpriteSheet) -> pygame.Surface:
     """Super pastille (power pellet)."""
     return sheet.at(*SUPERGUM_RECT)
+
+
+# Frightened: ligne du red (y=64), après les 8 tuiles directionnelles.
+FRIGHT_Y = 64
+FRIGHT_BLUE_X = (132, 148)    # 2 frames bleues
+FRIGHT_WHITE_X = (164, 180)   # 2 frames blanches (clignotement de fin)
+
+
+def load_frightened(sheet: SpriteSheet) -> dict[str, list[pygame.Surface]]:
+    """Frames frightened : {'blue': [..], 'white': [..]}."""
+    blue = [sheet.at(x, FRIGHT_Y) for x in FRIGHT_BLUE_X]
+    white = [sheet.at(x, FRIGHT_Y) for x in FRIGHT_WHITE_X]
+    return {"blue": blue, "white": white}

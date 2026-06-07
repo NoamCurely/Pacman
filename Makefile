@@ -1,26 +1,40 @@
-VENV = .venv
+export	UV_CACHE_DIR	= .cache/uv
+export	PIP_CACHE_DIR	= .cache/pip
+
+VENV	= .venv
+PAC	= ./pac-man.py
+ARGS	= $(filter-out $@, $(MAKECMDGOALS))
+PDB	= pudb
 
 install:
-	uv sync
+	@if [ ! -d '$(VENV)' ]; then \
+		uv sync; \
+	fi
 
-run:
-	uv run python $(pac) $(config)
+run: install
+	@uv run --no-sync python $(PAC) $(ARGS)
 
-debug:
-	uv run python -m pdb $(pac) $(config)
+debug: install
+	@uv run --no-sync python -m $(PDB) $(PAC) $(ARGS)
 
 clean:
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type d -name .mypy_cache -exec rm -rf {} +
-	rm -rf $(VENV)
+	@find . -type d -name __pycache__ -exec rm -rf {} +; \
+	find . -type d -name .mypy_cache -exec rm -rf {} +; \
+	rm -rf $(VENV); \
 	rm -rf data/output/*.json
 
-lint:
-	uv run flake8 . --exclude=.venv,__pycache__,llm_sdk
+lint: install
+	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk; \
 	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-lint-strict:
-	uv run flake8 . --exclude=.venv,__pycache__,llm_sdk
-	uv run mypy . --strict
+lint-strict: install
+	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk
+	@uv run mypy . --strict
 
-re: clean install run
+re: clean run
+
+
+.PHONY: install run debug clean lint lint-strict re
+
+%:
+	@:

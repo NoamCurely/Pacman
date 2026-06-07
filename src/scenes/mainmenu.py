@@ -8,13 +8,19 @@ class MainMenu(Menu):
     """Menu principal: navigation flèches, validation Entrée."""
 
     def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config) -> None:
+                 config: Config, cheat: bool = False,
+                 selected: int = 0) -> None:
         super().__init__(fonts, screen_rect, config)
+        self.selected = selected
+        self.fonts = fonts
+        self.screen_rect = screen_rect
+        self.config = config
+        self.cheat = cheat
         self.options = [
             ("START GAME", self.start),
             ("HIGHSCORES", self.highscores),
             ("INSTRUCTIONS", self.instructions),
-            ("CHEAT", self.cheat),
+            ("CHEAT: " + str(self.cheat), self.toggle_cheat),
             ("CUSTOM", self.custom),
             ("EXIT", self.exit),
         ]
@@ -22,20 +28,40 @@ class MainMenu(Menu):
 
     def choose(self) -> None:
         _, action = self.options[self.selected]
-        action()
+        if action is not None:
+            action()
 
     def start(self) -> None:
         from src.scenes.game import Game
         self.next_scene = Game(self.fonts, self.screen_rect, self.config)
 
     def highscores(self) -> None:
-        pass
+        from src.scenes.highscores import Highscores
+        self.next_scene = Highscores(
+            self.fonts,
+            self.screen_rect,
+            self.config,
+            self)
 
     def instructions(self) -> None:
-        pass
+        from src.scenes.instructions import Instructions
+        self.next_scene = Instructions(
+            self.fonts,
+            self.screen_rect,
+            self.config,
+            self
+        )
 
-    def cheat(self) -> None:
-        pass
+    def toggle_cheat(self) -> None:
+        self.cheat = not self.cheat
+        MainMenu.__init__(
+            self,
+            self.fonts,
+            self.screen_rect,
+            self.config,
+            self.cheat,
+            self.selected
+        )
 
     def custom(self) -> None:
         from src.scenes.custom import Custom

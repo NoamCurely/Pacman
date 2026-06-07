@@ -35,7 +35,7 @@ NIX_CC='/nix/store/qd70v8g0561vm8m33kmnp79z00cgyi5n-gcc-wrapper-15.2.0'
 export NIX_CC
 NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu='1'
 export NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu
-NIX_CFLAGS_COMPILE=' -frandom-seed=rk31abw6rm'
+NIX_CFLAGS_COMPILE=' -frandom-seed=fpdi2fg9mq'
 export NIX_CFLAGS_COMPILE
 NIX_ENFORCE_NO_NATIVE='1'
 export NIX_ENFORCE_NO_NATIVE
@@ -177,7 +177,7 @@ export propagatedNativeBuildInputs
 declare -a propagatedTargetDepFiles=('propagated-target-target-deps' )
 shell='/nix/store/i27rhb3nr65rkrwz36bchkwmav6ggsmn-bash-5.3p9/bin/bash'
 export shell
-shellHook='export LD_LIBRARY_PATH="/run/opengl-driver/lib:/nix/store/ysbyz6zabjcg078ssp4l58mhgbr57pbz-wayland-1.24.0/lib:/nix/store/0c0xdj7xpilqfy2p33l1jm407f01652w-libxkbcommon-1.13.1/lib:/nix/store/ahqsxd08a4vp5p4wgmkgjda81jy8zpjp-libdecor-0.2.5/lib:/nix/store/fdqacryg2w9kiwb94c9rzfsyff4im8xj-libglvnd-1.7.0/lib:/nix/store/1jx6xl1bn80av3xmiarlb8lnavmc4grs-libdrm-2.4.131/lib:/nix/store/5m91jqg1526jzsahrgmd37k4ml3nc5l4-libx11-1.8.13/lib:/nix/store/n1ykqk7ibmp4h5r4x5fng4cn9wjlgj9y-libxext-1.3.7/lib:/nix/store/8crm1m4x7xqq7nsp9p1war9scj2pjry3-libxrandr-1.5.5/lib:/nix/store/wnl69g3p3cb415xxxz09hfvrj624fg18-libxi-1.8.2/lib:/nix/store/917cm887c5gz2c56ihys80mf2g8fkjj0-libxcursor-1.2.3/lib:/nix/store/rvx68qsgl3qm8wnyywbdkvh2gp47np5p-libpulseaudio-17.0/lib:/nix/store/3innqpmxwvmr2vc8h51g47aqdl6zj2b4-alsa-lib-1.2.15.3/lib:/nix/store/bg6ms0vw071g1fdbx2my6bbzsk62p6vd-fontconfig-2.17.1-lib/lib:/nix/store/zr22ggqbv79yv4y4wv06r4grla9h59yx-freetype-2.14.2/lib:/nix/store/ixhlv41i2wpl84xgjcks061dz4yssbg3-zlib-1.3.2/lib:/nix/store/si4q3zks5mn5jhzzyri9hhd3cv789vlm-gcc-15.2.0-lib/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+shellHook='export LD_LIBRARY_PATH="/run/opengl-driver/lib:/nix/store/ysbyz6zabjcg078ssp4l58mhgbr57pbz-wayland-1.24.0/lib:/nix/store/0c0xdj7xpilqfy2p33l1jm407f01652w-libxkbcommon-1.13.1/lib:/nix/store/ahqsxd08a4vp5p4wgmkgjda81jy8zpjp-libdecor-0.2.5/lib:/nix/store/fdqacryg2w9kiwb94c9rzfsyff4im8xj-libglvnd-1.7.0/lib:/nix/store/1jx6xl1bn80av3xmiarlb8lnavmc4grs-libdrm-2.4.131/lib:/nix/store/5m91jqg1526jzsahrgmd37k4ml3nc5l4-libx11-1.8.13/lib:/nix/store/n1ykqk7ibmp4h5r4x5fng4cn9wjlgj9y-libxext-1.3.7/lib:/nix/store/8crm1m4x7xqq7nsp9p1war9scj2pjry3-libxrandr-1.5.5/lib:/nix/store/wnl69g3p3cb415xxxz09hfvrj624fg18-libxi-1.8.2/lib:/nix/store/917cm887c5gz2c56ihys80mf2g8fkjj0-libxcursor-1.2.3/lib:/nix/store/rvx68qsgl3qm8wnyywbdkvh2gp47np5p-libpulseaudio-17.0/lib:/nix/store/3innqpmxwvmr2vc8h51g47aqdl6zj2b4-alsa-lib-1.2.15.3/lib:/nix/store/zcmsivndca5wmam9nwnbjrm0zkgykwfz-glib-2.86.3/lib:/nix/store/bg6ms0vw071g1fdbx2my6bbzsk62p6vd-fontconfig-2.17.1-lib/lib:/nix/store/zr22ggqbv79yv4y4wv06r4grla9h59yx-freetype-2.14.2/lib:/nix/store/ixhlv41i2wpl84xgjcks061dz4yssbg3-zlib-1.3.2/lib:/nix/store/si4q3zks5mn5jhzzyri9hhd3cv789vlm-gcc-15.2.0-lib/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 echo "pygame devshell ready -> run: make run pac=pac-man.py config=config.json"
 '
 export shellHook
