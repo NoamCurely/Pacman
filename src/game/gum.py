@@ -1,5 +1,7 @@
-import pygame
+"""Gum: placement, eating and rendering of pacgums and super-pacgums."""
 import random
+
+import pygame
 
 from src.game.maze import Maze
 from src.parsing import Config
@@ -9,6 +11,8 @@ SUPER_COLOR = (255, 230, 180)
 
 
 class Gum:
+    """Track and draw the pacgums and super-pacgums of a level."""
+
     def __init__(
         self,
         maze: Maze,
@@ -25,7 +29,7 @@ class Gum:
         self.place(maze, config)
 
     def place(self, maze: Maze, config: Config) -> None:
-        """Pose les supers aux coins + config.pacgum pacgums aléatoires."""
+        """Put super-pacgums in corners and pacgums on random cells."""
         corners = maze.corner_cells()
         skip = self.ghost_spawns | {self.player_spawn}
 
@@ -47,6 +51,7 @@ class Gum:
         self.gum = set(picker.sample(candidates, wanted_count))
 
     def eat(self, cell: tuple[int, int]) -> int:
+        """Eat the gum at cell and return the points scored."""
         if cell in self.gum:
             self.gum.discard(cell)
             return self.points_pacgum
@@ -56,11 +61,12 @@ class Gum:
         return 0
 
     def remaining(self) -> int:
+        """Return the number of pacgums left."""
         return len(self.gum)
 
     def draw(self, screen: pygame.Surface, area: pygame.Rect,
              maze: Maze) -> None:
-        """Draw remaining pacgums and super-pacgums."""
+        """Draw all remaining pacgums and super-pacgums."""
         size = maze.cell_size(area)
         r = max(2, size // 10)
         big_r = max(4, size // 6)

@@ -1,12 +1,19 @@
+"""Highscores: load, display and persist the top scores."""
+from json import loads, dump
+
 import pygame
+
 from src.fonts import Fonts
 from src.parsing import Config
 from src.scenes.menu import Menu
-from src.scenes.scene import Scene
-from json import loads, dump
+from src.scenes.scene import Scene, scaled
+
+SAVE_PATH = 'src/saves/highscores.json'
 
 
 class Highscores(Menu):
+    """Menu showing the saved scores and persisting new ones."""
+
     def __init__(
         self,
         fonts: Fonts,
@@ -17,11 +24,11 @@ class Highscores(Menu):
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
         h = screen_rect.height
-        self.font = fonts.get("Pacmania.otf", round(h * 32 / 720))
-        self.title = fonts.get("Pacmania.otf", round(h * 64 / 720))
-        self.start_y = round(h * 100 / 720)
+        self.font = fonts.get("Pacmania.otf", scaled(h, 32))
+        self.title = fonts.get("Pacmania.otf", scaled(h, 64))
+        self.start_y = scaled(h, 100)
 
-        with open('src/saves/highscores.json', 'r') as f:
+        with open(SAVE_PATH, 'r') as f:
             self.data = loads(f.read())
 
         self.keymap[pygame.K_UP] = self.restrict
@@ -29,6 +36,7 @@ class Highscores(Menu):
         self.keymap[pygame.K_ESCAPE] = self.back
 
     def draw(self, screen: pygame.Surface) -> None:
+        """Draw the title and the scores sorted high to low."""
         line_height = self.font.get_linesize()
         screen.fill('black')
         txt_color = 'GREY'
@@ -40,10 +48,10 @@ class Highscores(Menu):
         t_surf = self.title.render("HIGHSCORES", True, "YELLOW")
         t_rect = t_surf.get_rect(
             center=(self.screen_rect.centerx,
-                    self.start_y - round(self.screen_rect.height * 50 / 720)))
+                    self.start_y - scaled(self.screen_rect.height, 50)))
         screen.blit(t_surf, t_rect)
 
-        list_top = self.start_y + round(self.screen_rect.height * 60 / 720)
+        list_top = self.start_y + scaled(self.screen_rect.height, 60)
         for i, entry in enumerate(sorted_data):
             surf = self.font.render(
                 entry['name'] + '   -   ' + str(entry['score']),
@@ -54,26 +62,35 @@ class Highscores(Menu):
             screen.blit(surf, rect)
 
     def add_score(self, name: str, score: int) -> None:
+        """Add or update the score for name and persist the list."""
         if self.if_exist(name):
             self.update_score(name, score)
             return
 
         self.data.append({'name': name, 'score': score})
-        dump(self.data, open('src/saves/highscores.json', 'w'), indent=2)
+        self.save()
 
     def update_score(self, name: str, score: int) -> None:
+        """Overwrite an existing player's score and persist."""
         for entry in self.data:
             if entry['name'] == name:
                 entry['score'] = score
                 break
 
-        dump(self.data, open('src/saves/highscores.json', 'w'), indent=2)
+        self.save()
+
+    def save(self) -> None:
+        """Persist the score list to disk."""
+        with open(SAVE_PATH, 'w') as f:
+            dump(self.data, f, indent=2)
 
     def if_exist(self, name: str) -> bool:
+        """Return True if a score already exists for name."""
         for entry in self.data:
             if entry['name'] == name:
                 return True
         return False
 
     def back(self) -> None:
+        """Return to the previous scene."""
         self.next_scene = self.previous

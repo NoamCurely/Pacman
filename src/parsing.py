@@ -1,3 +1,6 @@
+"""Parsing: read JSON-with-comments config into a validated Config."""
+import json
+
 from pydantic import (
     BaseModel,
     Field,
@@ -5,8 +8,6 @@ from pydantic import (
     field_validator,
     ValidationInfo
 )
-import json
-
 
 COMMENT_PREFIXES = ("#", "//", "/*")
 
@@ -29,7 +30,6 @@ class Level(BaseModel):
 
 class Config(BaseModel):
     """Game configuration with validation and defaults."""
-    highscore_filename: str = "highscores.json"
     lives: int = DEFAULTS["lives"]
     pacgum: int = DEFAULTS["pacgum"]
     points_per_pacgum: int = DEFAULTS["points_per_pacgum"]
@@ -37,7 +37,7 @@ class Config(BaseModel):
     points_per_ghost: int = DEFAULTS["points_per_ghost"]
     seed: int = DEFAULTS["seed"]
     level_max_time: int = DEFAULTS["level_max_time"]
-    levels: list[Level] = []
+    levels: list[Level] = [Level(width=15, height=15)]
 
     @field_validator(
         "lives",

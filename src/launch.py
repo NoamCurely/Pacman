@@ -1,4 +1,6 @@
+"""Launch: set up pygame and run the main scene loop."""
 import pygame
+
 from src.parsing import Config
 from src.fonts import Fonts
 from src.scenes.scene import Scene
@@ -6,10 +8,13 @@ from src.scenes.landing import Landing
 
 
 class Launch:
+    """Own the pygame window and drive the scene state machine."""
+
     def __init__(self, config: Config) -> None:
         self.config = config
 
     def menu(self) -> None:
+        """Run the main loop until quit, switching scenes as requested."""
         try:
             pygame.mixer.pre_init(44100, -16, 2, 512)
         except (pygame.error, NotImplementedError):

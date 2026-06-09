@@ -1,3 +1,4 @@
+"""Maze: wrap the generated grid and provide geometry and collisions."""
 import pygame
 
 from mazegenerator import MazeGenerator
@@ -8,14 +9,20 @@ WALL_W = 4
 
 
 class Maze:
+    """A maze grid with pixel geometry helpers and wall queries."""
+
     def __init__(self, width: int, height: int, seed: int = 0) -> None:
         gen = MazeGenerator(size=(width, height), perfect=False, seed=seed)
         self.grid: list[list[int]] = gen.maze
         self.rows = len(self.grid)
         self.cols = len(self.grid[0])
 
-    def draw(self, screen: pygame.Surface,
-             area: pygame.Rect | None = None) -> None:
+    def draw(
+        self,
+        screen: pygame.Surface,
+        area: pygame.Rect | None = None
+    ) -> None:
+        """Draw the maze walls inside the given area."""
         if area is None:
             area = screen.get_rect()
         cell_size, offset_x, offset_y = self._geometry(area)
@@ -67,30 +74,42 @@ class Maze:
         """Return pixel size of one cell for the given draw area."""
         return self._geometry(area)[0]
 
-    def cell_center(self, col: int, row: int,
-                    area: pygame.Rect) -> tuple[int, int]:
+    def cell_center(
+        self,
+        col: int,
+        row: int,
+        area: pygame.Rect
+    ) -> tuple[int, int]:
         """Return pixel center of cell (col, row) within area."""
         size, offset_x, offset_y = self._geometry(area)
         return (offset_x + col * size + size // 2,
                 offset_y + row * size + size // 2)
 
-    def cell_at(self, px: float, py: float,
-                area: pygame.Rect) -> tuple[int, int]:
+    def cell_at(
+        self,
+        px: float,
+        py: float,
+        area: pygame.Rect
+    ) -> tuple[int, int]:
         """Return (col, row) of the cell containing pixel (px, py)."""
         size, offset_x, offset_y = self._geometry(area)
         return (int((px - offset_x) // size),
                 int((py - offset_y) // size))
 
-    def is_wall(self, px: float, py: float,
-                dx: float, dy: float,
-                area: pygame.Rect) -> bool:
+    def is_wall(
+        self,
+        px: float,
+        py: float,
+        dx: float,
+        dy: float,
+        area: pygame.Rect
+    ) -> bool:
+        """Return True if moving by (dx, dy) from (px, py) hits a wall."""
         col0, row0 = self.cell_at(px, py, area)
 
-        WALL_MARGIN = self.cell_size(area) // 3
-        nx = px + dx + (WALL_MARGIN if dx > 0 else -
-                        WALL_MARGIN if dx < 0 else 0)
-        ny = py + dy + (WALL_MARGIN if dy > 0 else -
-                        WALL_MARGIN if dy < 0 else 0)
+        margin = self.cell_size(area) // 3
+        nx = px + dx + (margin if dx > 0 else -margin if dx < 0 else 0)
+        ny = py + dy + (margin if dy > 0 else -margin if dy < 0 else 0)
         col1, row1 = self.cell_at(nx, ny, area)
 
         if not (0 <= row1 < self.rows and 0 <= col1 < self.cols):

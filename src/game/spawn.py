@@ -1,3 +1,4 @@
+"""Spawn: compute the player and ghost spawn cells of a maze."""
 import random
 
 from src.game.maze import Maze
@@ -11,8 +12,7 @@ class Spawn:
         self.maze = maze
 
     def ghost_spawns(self) -> list[tuple[int, int]]:
-        """Return the four ghost spawn cells: each corner moved one cell
-        toward the maze center."""
+        """Return the four corner cells each moved one step inward."""
         cx, cy = self.maze.cols // 2, self.maze.rows // 2
         cells = []
         for corner_x, corner_y in self.maze.corner_cells():
@@ -22,17 +22,9 @@ class Spawn:
         return cells
 
     def random_ghost(self, ghosts: list[Ghost]) -> None:
-        """Assign each ghost a random spawn cell among the four spots.
-
-        Utilise un RNG indépendant : le générateur de maze seed le
-        `random` global, ce qui figerait le tirage.
-        """
+        """Assign each ghost a random spawn cell using an independent RNG."""
         cells = self.ghost_spawns()
         rng = random.Random()
         rng.shuffle(cells)
         for ghost, cell in zip(ghosts, cells):
             ghost.spawn_cell = cell
-
-    def player_spawn(self) -> tuple[int, int]:
-        """Return the player spawn cell (maze center)."""
-        return (self.maze.cols // 2, self.maze.rows // 2)

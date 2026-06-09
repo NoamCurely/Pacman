@@ -1,7 +1,9 @@
+"""Game scene: the playable level loop, scoring and transitions."""
 import pygame
+
 from src.fonts import Fonts
 from src.parsing import Config
-from src.scenes.scene import Scene
+from src.scenes.scene import Scene, scaled
 from src.ui.hud import Hud
 from src.game.maze import Maze, BG_COLOR
 from src.game.pacman import Pacman
@@ -10,12 +12,19 @@ from src.game.ghost import Ghost
 from src.game.spawn import Spawn
 from src.sounds import sfx
 
+DEATH_FRAME_MS = 150
+
 
 class Game(Scene):
-    """Scène de jeu: labyrinthe du niveau courant + bandeau HUD en bas."""
+    """Run one playthrough: levels, ghosts, scoring and game states."""
 
-    def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config, cheat: bool = False) -> None:
+    def __init__(
+        self,
+        fonts: Fonts,
+        screen_rect: pygame.Rect,
+        config: Config,
+        cheat: bool = False
+    ) -> None:
         super().__init__()
         self.fonts = fonts
         self.screen_rect = screen_rect
@@ -25,7 +34,7 @@ class Game(Scene):
         self.noclip = False
 
         h = screen_rect.height
-        hud_h = round(h * 40 / 720)
+        hud_h = scaled(h, 40)
         panel_w = 140 if cheat else 0
         self.maze_area = pygame.Rect(
             0, 0, screen_rect.width - panel_w, h - hud_h)
@@ -33,9 +42,7 @@ class Game(Scene):
             0, h - hud_h, screen_rect.width, hud_h)
         self.cheat_panel = pygame.Rect(
             screen_rect.width - panel_w, 0, panel_w, h - hud_h)
-        self.hud = Hud(
-            fonts, self.hud_area,
-            {"invincible": False, "noclip": False} if cheat else None)
+        self.hud = Hud(fonts, self.hud_area)
 
         self.score = 0
         self.lives = config.lives
@@ -52,9 +59,8 @@ class Game(Scene):
 
         sfx.play("pacman_beginning.wav")
 
-    DEATH_FRAME_MS = 150
-
     def update(self) -> None:
+        """Step the game one frame: move entities, score and collisions."""
         elapsed = (pygame.time.get_ticks() - self.start_ticks) // 1000
         self.time_left = max(0, self.config.level_max_time - elapsed)
         if self.time_left == 0:
@@ -110,22 +116,22 @@ class Game(Scene):
             if ghost.frightened:
                 self.score += self.config.points_per_ghost
                 sfx.play("pacman_eatghost.wav")
-                ghost.eaten(self.maze_area)
+                ghost.eaten()
             elif not self.invincible:
                 self.start_death()
                 break
 
     def start_death(self) -> None:
-        """Lance l'animation de mort (gèle le jeu)."""
+        """Start the death animation and freeze the game."""
         self.dying = True
         self.death_idx = 0
         self.death_last = pygame.time.get_ticks()
         sfx.play("pacman_death.wav")
 
     def animate_death(self) -> None:
-        """Avance les frames de mort ; à la fin -> lose_life."""
+        """Advance death frames; lose a life once the animation ends."""
         now = pygame.time.get_ticks()
-        if now - self.death_last >= self.DEATH_FRAME_MS:
+        if now - self.death_last >= DEATH_FRAME_MS:
             self.death_idx += 1
             self.death_last = now
             if self.death_idx >= len(self.pacman.death_frames):
@@ -133,13 +139,14 @@ class Game(Scene):
                 self.lose_life()
 
     def build_level(self) -> None:
+        """Create the maze, player, gums and ghosts for the level."""
         level = self.config.levels[self.levels]
         self.maze = Maze(
             level.width,
             level.height,
             seed=self.config.seed
             )
-        self.pacman = Pacman(self.maze, self.config, self.maze_area)
+        self.pacman = Pacman(self.maze_area)
         x, y = self.maze.find_open_cell(self.maze_area)
         self.pacman.pos = pygame.Vector2(x, y)
         spawn_cell = self.maze.cell_at(x, y, self.maze_area)
@@ -153,6 +160,7 @@ class Game(Scene):
             ghost.reset(self.maze_area)
 
     def next_level(self) -> None:
+        """Advance to the next level or trigger the victory scene."""
         self.levels += 1
         if self.levels >= len(self.config.levels):
             from src.scenes.victory import Victory
@@ -164,6 +172,7 @@ class Game(Scene):
         self.build_level()
 
     def lose_life(self) -> None:
+        """Remove a life and respawn, or go to game over."""
         self.lives -= 1
         if self.lives <= 0:
             from src.scenes.gameover import GameOver
@@ -173,6 +182,7 @@ class Game(Scene):
         self.respawn()
 
     def respawn(self) -> None:
+        """Reposition the player and briefly hide the ghosts."""
         sx, sy = self.maze.find_open_cell(self.maze_area)
         self.pacman.pos = pygame.Vector2(sx, sy)
         self.pacman.vel = pygame.Vector2(0, 0)
@@ -181,6 +191,7 @@ class Game(Scene):
         self.ghost_respawn_at = pygame.time.get_ticks() + 5000
 
     def handle_event(self, event: pygame.event.Event) -> None:
+        """Forward input to the player and apply cheat toggles."""
         self.pacman.handle_event(event)
         if not self.cheat or event.type != pygame.KEYDOWN:
             return
@@ -196,6 +207,7 @@ class Game(Scene):
             self.gum.super_gum.clear()
 
     def draw(self, screen: pygame.Surface) -> None:
+        """Render the maze, gums, ghosts, HUD and the player sprite."""
         screen.fill(BG_COLOR)
         self.maze.draw(screen, self.maze_area)
         self.gum.draw(screen, self.maze_area, self.maze)

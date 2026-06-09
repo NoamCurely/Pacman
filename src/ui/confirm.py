@@ -1,12 +1,9 @@
+"""ConfirmDialog: reusable modal overlay with a title and a hint."""
 import pygame
 
 
 class ConfirmDialog:
-    """Modal de confirmation: voile sombre + panneau + titre + indice.
-
-    Composant de dessin pur, réutilisable. La scène garde son état
-    (ouvert/fermé) et sa gestion clavier.
-    """
+    """Pure drawing helper for a dimmed modal panel; the scene owns state."""
 
     def __init__(self, title_font: pygame.font.Font,
                  hint_font: pygame.font.Font,
@@ -33,7 +30,7 @@ class ConfirmDialog:
 
     def draw(self, screen: pygame.Surface, rect: pygame.Rect,
              title: str, hint: str) -> None:
-        # voile sombre plein écran
+        """Draw the dim overlay, the panel and the title and hint text."""
         dim = pygame.Surface(rect.size, pygame.SRCALPHA)
         dim.fill((0, 0, 0, self.dim_alpha))
         screen.blit(dim, rect.topleft)
@@ -44,7 +41,6 @@ class ConfirmDialog:
         hint_rect = hint_surf.get_rect(
             center=(rect.centerx, rect.centery + self.gap))
 
-        # panneau opaque derrière le texte
         panel = title_rect.union(hint_rect).inflate(self.pad * 2, self.pad * 2)
         pygame.draw.rect(screen, self.panel_color, panel,
                          border_radius=self.radius)

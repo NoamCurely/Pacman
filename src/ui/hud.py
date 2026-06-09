@@ -1,4 +1,6 @@
+"""HUD: score, lives, time, level and the cheat panel overlay."""
 import pygame
+
 from src.fonts import Fonts
 from src.game.spritesheet import load_pacman_dir, SpriteSheet
 
@@ -10,15 +12,10 @@ TITLE = (255, 255, 255)
 
 
 class Hud:
+    """Render the in-game HUD and the optional cheat panel."""
 
-    def __init__(
-        self,
-        fonts: Fonts,
-        area: pygame.Rect,
-        cheats: dict[str, bool] | None = None
-    ) -> None:
+    def __init__(self, fonts: Fonts, area: pygame.Rect) -> None:
         self.fonts = fonts
-        self.cheats = cheats or {}
         self.sheet = SpriteSheet()
         size = max(12, round(area.height * 0.5))
         self.font = fonts.get("Pacmania.otf", size)
@@ -33,6 +30,7 @@ class Hud:
         panel: pygame.Rect,
         cheats: dict[str, bool]
     ) -> None:
+        """Draw the cheat panel listing each toggle and its state."""
         if not cheats:
             return
 
@@ -64,6 +62,7 @@ class Hud:
         time_left: int,
         level: int
     ) -> None:
+        """Draw score, lives, time and level across the HUD bar."""
         labels = [
             f"Score: {score}",
             "Lives:",

@@ -1,16 +1,22 @@
+"""Ghost entity: pathfinding, chase/flee behaviour and rendering."""
 import heapq
 import random
+
 import pygame
 
 from src.game.maze import Maze
-from src.game.directions import DIRECTIONS as DIRS
+from src.game.directions import DIRECTIONS as DIRS, OPPOSITE
 from src.game.spritesheet import SpriteSheet, load_ghost, load_frightened
 
 GHOST_SIZE = 32
 RNG = random.Random()
+DEAD_MS = 5000
+
+Cell = tuple[int, int]
 
 
-def neighbors(maze, area, cell):
+def neighbors(maze: Maze, area: pygame.Rect, cell: Cell) -> list[Cell]:
+    """Return the walkable cells adjacent to cell."""
     col, row = cell
     cx, cy = maze.cell_center(col, row, area)
     step = maze.cell_size(area)
@@ -21,14 +27,21 @@ def neighbors(maze, area, cell):
     return result
 
 
-def manhattan(a, b):
+def manhattan(a: Cell, b: Cell) -> int:
+    """Return the Manhattan distance between two cells."""
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def astar(maze, area, start, goal):
+def astar(
+    maze: Maze,
+    area: pygame.Rect,
+    start: Cell,
+    goal: Cell,
+) -> list[Cell]:
+    """Return the shortest cell path from start to goal via A*."""
     count = 0
     open_heap = [(manhattan(start, goal), count, start)]
-    came_from = {}
+    came_from: dict[Cell, Cell] = {}
     g = {start: 0}
 
     while open_heap:
@@ -52,6 +65,7 @@ def astar(maze, area, start, goal):
 
 
 class Ghost:
+    """A single ghost with its sprites, position and AI state."""
 
     def __init__(self, maze: Maze, name: str, speed: float) -> None:
         self.maze = maze
@@ -70,15 +84,16 @@ class Ghost:
         }
         self.direction = "right"
         self.frame_idx = 0
-        self.spawn_cell: tuple[int, int] = (0, 0)
+        self.spawn_cell: Cell = (0, 0)
         self.pos = pygame.Vector2(0, 0)
-        self.dir: tuple[int, int] = (0, 0)
+        self.dir: Cell = (0, 0)
         self.frightened = False
         self.fright_until = 0
         self.dead = False
         self.dead_until = 0
 
     def reset(self, area: pygame.Rect) -> None:
+        """Move the ghost back to its spawn cell and clear dead state."""
         cx, cy = self.maze.cell_center(*self.spawn_cell, area)
         self.pos = pygame.Vector2(cx, cy)
         self.dead = False
@@ -86,29 +101,29 @@ class Ghost:
         self.dir = (0, 0)
 
     def set_frightened(self, duration_ms: int = 7000) -> None:
+        """Make the ghost edible for the given duration."""
         self.frightened = True
         self.fright_until = pygame.time.get_ticks() + duration_ms
 
-    DEAD_MS = 5000
-
-    def eaten(self, area: pygame.Rect) -> None:
+    def eaten(self) -> None:
+        """Mark the ghost as eaten and start its respawn timer."""
         self.frightened = False
         self.dir = (0, 0)
         self.dead = True
-        self.dead_until = pygame.time.get_ticks() + self.DEAD_MS
+        self.dead_until = pygame.time.get_ticks() + DEAD_MS
 
     def flee_dir(self, area: pygame.Rect) -> str | None:
+        """Return a random open direction, avoiding a U-turn when possible."""
         exits = self.open_dirs(area)
         if not exits:
             return None
-        opposite = {"up": "down", "down": "up",
-                    "left": "right", "right": "left"}
-        back = opposite[self.direction]
+        back = OPPOSITE[self.direction]
         if len(exits) > 1 and back in exits:
             exits = [d for d in exits if d != back]
         return RNG.choice(exits)
 
-    def open_dirs(self, area):
+    def open_dirs(self, area: pygame.Rect) -> list[str]:
+        """Return the direction names not blocked by a wall."""
         cx, cy = self.pos.x, self.pos.y
         step = self.maze.cell_size(area)
         exits = []
@@ -117,7 +132,14 @@ class Ghost:
                 exits.append(name)
         return exits
 
-    def astar_dir(self, maze, area, start_cell, goal_cell):
+    def astar_dir(
+        self,
+        maze: Maze,
+        area: pygame.Rect,
+        start_cell: Cell,
+        goal_cell: Cell,
+    ) -> str | None:
+        """Return the first step direction of the A* path, if any."""
         path = astar(maze, area, start_cell, goal_cell)
         if len(path) < 2:
             return None
@@ -129,7 +151,8 @@ class Ghost:
                 return name
         return None
 
-    def target_cell(self, pac_cell, pac_dir):
+    def target_cell(self, pac_cell: Cell, pac_dir: str) -> Cell:
+        """Return the chase target cell for this ghost's personality."""
         if self.name == "pinky":
             dx, dy = DIRS.get(pac_dir, (0, 0))
             return (pac_cell[0] + dx * 4, pac_cell[1] + dy * 4)
@@ -139,8 +162,14 @@ class Ghost:
             return (pac_cell[0] - 2, pac_cell[1] - 2)
         return pac_cell
 
-    def update(self, maze: Maze, area: pygame.Rect,
-               pac_cell, pac_dir) -> None:
+    def update(
+        self,
+        maze: Maze,
+        area: pygame.Rect,
+        pac_cell: Cell,
+        pac_dir: str,
+    ) -> None:
+        """Advance the ghost: pick a direction at cell centers and move."""
         if self.dead:
             if pygame.time.get_ticks() >= self.dead_until:
                 self.reset(area)
@@ -173,6 +202,7 @@ class Ghost:
         self.pos.y += dy * self.speed
 
     def draw(self, screen: pygame.Surface, area: pygame.Rect) -> None:
+        """Blit the current ghost sprite (normal or frightened)."""
         if self.dead:
             return
         if self.frightened:
