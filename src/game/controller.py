@@ -1,22 +1,21 @@
 import pygame
 from src.game.maze import Maze
-from src.game.spritesheet import SpriteSheet, load_pacman_dir
+from src.game.directions import DIRECTIONS as VECTORS
+from src.game.spritesheet import SpriteSheet, load_pacman
 
 
 class Controller:
     FRAME_MS = 200
     SPEED = 2.5
     SNAP_THRESHOLD = SPEED + 6
-    VECTORS = {
-        'right': (1, 0),
-        'left': (-1, 0),
-        'up': (0, -1),
-        'down': (0, 1),
-    }
 
     def __init__(self, screen_rect: pygame.Rect) -> None:
         self.screen_rect = screen_rect
         self.sheet = SpriteSheet()
+        self.frames_by_dir = {
+            d: [SpriteSheet.scale(f, 32) for f in fs]
+            for d, fs in load_pacman(self.sheet).items()
+        }
         self.direction = 'right'
         self.queued_dir: str | None = None
         self.frames: list[pygame.Surface] = []
@@ -36,29 +35,19 @@ class Controller:
 
     def change_dir(self, direction: str) -> None:
         self.direction = direction
-        raw_frames = load_pacman_dir(self.sheet, direction)
-        self.frames = [SpriteSheet.scale(f, 32) for f in raw_frames]
+        self.frames = self.frames_by_dir[direction]
         self.frame_idx = 0
-        self.vel = pygame.Vector2(self.VECTORS[direction]) * self.SPEED
+        self.vel = pygame.Vector2(VECTORS[direction]) * self.SPEED
 
-    def update(self, maze: Maze, maze_area: pygame.Rect) -> None:
+    def update(self, maze: Maze, maze_area: pygame.Rect,
+               noclip: bool = False) -> None:
         now = pygame.time.get_ticks()
         if (now - self.last_tick >= self.FRAME_MS):
             self.frame_idx = (self.frame_idx + 1) % len(self.frames)
             self.last_tick = now
 
-        cell_size = min(maze_area.width // maze.cols,
-                        maze_area.height // maze.rows)
-
-        offset_x = maze_area.x + (
-            maze_area.width - maze.cols * cell_size) // 2
-        offset_y = maze_area.y + (
-            maze_area.height - maze.rows * cell_size) // 2
-
-        col = int((self.pos.x - offset_x) // cell_size)
-        row = int((self.pos.y - offset_y) // cell_size)
-        cell_cx = offset_x + col * cell_size + cell_size // 2
-        cell_cy = offset_y + row * cell_size + cell_size // 2
+        col, row = maze.cell_at(self.pos.x, self.pos.y, maze_area)
+        cell_cx, cell_cy = maze.cell_center(col, row, maze_area)
 
         on_grid = (abs(self.pos.x - cell_cx) <= self.SNAP_THRESHOLD and
                    abs(self.pos.y - cell_cy) <= self.SNAP_THRESHOLD)
@@ -70,18 +59,17 @@ class Controller:
             self.pos.x = cell_cx
 
         if (self.queued_dir and on_grid):
-            vx, vy = self.VECTORS[self.queued_dir]
+            vx, vy = VECTORS[self.queued_dir]
             cand = pygame.Vector2(vx, vy) * self.SPEED
-            if not self._blocked(maze, maze_area, cand):
+            if noclip or not self._blocked(maze, maze_area, cand):
                 self.change_dir(self.queued_dir)
                 self.queued_dir = None
 
-        if not self._blocked(maze, maze_area, self.vel):
+        if noclip or not self._blocked(maze, maze_area, self.vel):
             self.pos += self.vel
 
     def _blocked(self, maze: Maze, maze_area: pygame.Rect,
                  vel: pygame.Vector2) -> bool:
-        """True si avancer de `vel` depuis la position courante tape un mur."""
         half = self.pac.get_width() // 2 - 1
         corners = [
             (-half, -half),

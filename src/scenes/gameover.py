@@ -6,7 +6,7 @@ from src.ui.confirm import ConfirmDialog
 
 
 class GameOver(Scene):
-    """Modal 'GAME OVER' + score. Retour menu après cooldown ou ENTER."""
+    """Modal 'GAME OVER' + score. ENTER -> saisie pseudo, cooldown -> menu."""
 
     COOLDOWN_MS = 30000
 
@@ -17,14 +17,17 @@ class GameOver(Scene):
         self.screen_rect = screen_rect
         self.config = config
         self.score = score
-        title_font = fonts.get("Pacmania.otf", 64)
-        hint_font = fonts.get("Pacmania.otf", 32)
+        h = screen_rect.height
+        title_font = fonts.get("Pacmania.otf", round(h * 64 / 720))
+        hint_font = fonts.get("Pacmania.otf", round(h * 32 / 720))
         self.dialog = ConfirmDialog(title_font, hint_font)
         self.start = pygame.time.get_ticks()
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            self.to_menu()
+            from src.scenes.nameentry import NameEntry
+            self.next_scene = NameEntry(
+                self.fonts, self.screen_rect, self.config, self.score)
 
     def update(self) -> None:
         if pygame.time.get_ticks() - self.start >= self.COOLDOWN_MS:

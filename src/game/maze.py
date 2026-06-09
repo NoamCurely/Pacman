@@ -86,7 +86,7 @@ class Maze:
                 area: pygame.Rect) -> bool:
         col0, row0 = self.cell_at(px, py, area)
 
-        WALL_MARGIN = 10
+        WALL_MARGIN = self.cell_size(area) // 3
         nx = px + dx + (WALL_MARGIN if dx > 0 else -
                         WALL_MARGIN if dx < 0 else 0)
         ny = py + dy + (WALL_MARGIN if dy > 0 else -

@@ -7,15 +7,19 @@ from json import loads, dump
 
 
 class Highscores(Menu):
-    def __init__(self, fonts: Fonts,
-                 screen_rect: pygame.Rect,
-                 config: Config,
-                 previous: Scene) -> None:
+    def __init__(
+        self,
+        fonts: Fonts,
+        screen_rect: pygame.Rect,
+        config: Config,
+        previous: Scene
+    ) -> None:
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
-        self.font = fonts.get("Pacmania.otf", 32)
-        self.title = fonts.get("Pacmania.otf", 64)
-        self.start_y = 100
+        h = screen_rect.height
+        self.font = fonts.get("Pacmania.otf", round(h * 32 / 720))
+        self.title = fonts.get("Pacmania.otf", round(h * 64 / 720))
+        self.start_y = round(h * 100 / 720)
 
         with open('src/saves/highscores.json', 'r') as f:
             self.data = loads(f.read())
@@ -34,40 +38,40 @@ class Highscores(Menu):
         )
 
         t_surf = self.title.render("HIGHSCORES", True, "YELLOW")
-        t_rect = t_surf.get_rect(center=(self.screen_rect.centerx,
-                                         self.start_y - 50))
+        t_rect = t_surf.get_rect(
+            center=(self.screen_rect.centerx,
+                    self.start_y - round(self.screen_rect.height * 50 / 720)))
         screen.blit(t_surf, t_rect)
 
+        list_top = self.start_y + round(self.screen_rect.height * 60 / 720)
         for i, entry in enumerate(sorted_data):
             surf = self.font.render(
                 entry['name'] + '   -   ' + str(entry['score']),
                 True,
                 txt_color)
             rect = surf.get_rect(center=(self.screen_rect.centerx,
-                                         self.start_y + i * line_height))
+                                         list_top + i * line_height))
             screen.blit(surf, rect)
 
     def add_score(self, name: str, score: int) -> None:
-        if (self.if_exist(name)):
+        if self.if_exist(name):
             self.update_score(name, score)
             return
 
-        new_entry = {'name': name, 'score': score}
-        self.data.append(new_entry)
-
+        self.data.append({'name': name, 'score': score})
         dump(self.data, open('src/saves/highscores.json', 'w'), indent=2)
 
     def update_score(self, name: str, score: int) -> None:
         for entry in self.data:
-            if (entry['name'] == name):
+            if entry['name'] == name:
                 entry['score'] = score
                 break
 
         dump(self.data, open('src/saves/highscores.json', 'w'), indent=2)
 
     def if_exist(self, name: str) -> bool:
-        for i in self.data:
-            if (i['name'] == name):
+        for entry in self.data:
+            if entry['name'] == name:
                 return True
         return False
 

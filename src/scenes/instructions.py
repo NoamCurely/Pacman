@@ -10,7 +10,7 @@ class Instructions(Menu):
                  config: Config, previous: Scene) -> None:
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
-        self.start_y = 100
+        self.start_y = round(screen_rect.height * 100 / 720)
 
         self.lines = ['HELP']
 

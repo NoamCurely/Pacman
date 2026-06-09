@@ -1,21 +1,13 @@
 import heapq
 import random
-
 import pygame
 
 from src.game.maze import Maze
+from src.game.directions import DIRECTIONS as DIRS
 from src.game.spritesheet import SpriteSheet, load_ghost, load_frightened
 
 GHOST_SIZE = 32
-SPEED = 2
-# RNG indépendant : le générateur de maze seed le random global.
 RNG = random.Random()
-DIRS = {
-    "up":    (0, -1),
-    "down":  (0, 1),
-    "left":  (-1, 0),
-    "right": (1, 0),
-}
 
 
 def neighbors(maze, area, cell):
@@ -61,9 +53,10 @@ def astar(maze, area, start, goal):
 
 class Ghost:
 
-    def __init__(self, maze: Maze, name: str) -> None:
+    def __init__(self, maze: Maze, name: str, speed: float) -> None:
         self.maze = maze
         self.name = name
+        self.speed = speed
         self.sheet = SpriteSheet()
         raw = load_ghost(self.sheet, name)
         self.frames = {
@@ -82,24 +75,29 @@ class Ghost:
         self.dir: tuple[int, int] = (0, 0)
         self.frightened = False
         self.fright_until = 0
+        self.dead = False
+        self.dead_until = 0
 
     def reset(self, area: pygame.Rect) -> None:
         cx, cy = self.maze.cell_center(*self.spawn_cell, area)
         self.pos = pygame.Vector2(cx, cy)
+        self.dead = False
+        self.dead_until = 0
+        self.dir = (0, 0)
 
     def set_frightened(self, duration_ms: int = 7000) -> None:
-        """Active l'état frightened pour duration_ms millisecondes."""
         self.frightened = True
         self.fright_until = pygame.time.get_ticks() + duration_ms
 
+    DEAD_MS = 5000
+
     def eaten(self, area: pygame.Rect) -> None:
-        """Mangé par pacman : redevient normal et respawn à son coin."""
         self.frightened = False
         self.dir = (0, 0)
-        self.reset(area)
+        self.dead = True
+        self.dead_until = pygame.time.get_ticks() + self.DEAD_MS
 
     def flee_dir(self, area: pygame.Rect) -> str | None:
-        """Direction aléatoire (fuite), sans mur ni demi-tour."""
         exits = self.open_dirs(area)
         if not exits:
             return None
@@ -143,11 +141,16 @@ class Ghost:
 
     def update(self, maze: Maze, area: pygame.Rect,
                pac_cell, pac_dir) -> None:
+        if self.dead:
+            if pygame.time.get_ticks() >= self.dead_until:
+                self.reset(area)
+            return
         if self.frightened and pygame.time.get_ticks() >= self.fright_until:
             self.frightened = False
         cx, cy = maze.cell_center(
             *maze.cell_at(self.pos.x, self.pos.y, area), area)
-        center = abs(self.pos.x - cx) < SPEED and abs(self.pos.y - cy) < SPEED
+        center = (abs(self.pos.x - cx) < self.speed
+                  and abs(self.pos.y - cy) < self.speed)
 
         if center:
             self.pos.update(cx, cy)
@@ -166,15 +169,17 @@ class Ghost:
                 self.dir = (0, 0)
 
         dx, dy = self.dir
-        self.pos.x += dx * SPEED
-        self.pos.y += dy * SPEED
+        self.pos.x += dx * self.speed
+        self.pos.y += dy * self.speed
 
     def draw(self, screen: pygame.Surface, area: pygame.Rect) -> None:
+        if self.dead:
+            return
         if self.frightened:
             remaining = self.fright_until - pygame.time.get_ticks()
             key = "blue"
             if remaining < 1000 and (remaining // 200) % 2 == 0:
-                key = "white"  # clignote dans la derniere seconde
+                key = "white"
             spr = self.fright[key][self.frame_idx % 2]
         else:
             spr = self.frames[self.direction][self.frame_idx]

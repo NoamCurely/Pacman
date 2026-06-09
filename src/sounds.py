@@ -33,5 +33,5 @@ class Sounds:
             snd.play()
 
 
-# Instance partagée : le mixer pygame est global de toute façon.
+
 sfx = Sounds()

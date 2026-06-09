@@ -13,7 +13,7 @@ class Launch:
         try:
             pygame.mixer.pre_init(44100, -16, 2, 512)
         except (pygame.error, NotImplementedError):
-            pass  # pas d'audio (système headless) -> on continue muet
+            pass
         pygame.init()
         pygame.mouse.set_visible(False)
         info = pygame.display.Info()

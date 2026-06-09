@@ -4,17 +4,11 @@ from pathlib import Path
 ASSET_DIR = Path(__file__).parent.parent.parent / "assets"
 SHEET_NAME = "Arcade - Pac-Man - Miscellaneous - General Sprites.png"
 
-# Grille de la feuille: pas de 16px, contenu utile ~14px (origine +1).
-# On extrait des tuiles de 16x16 et on laisse le padding transparent.
 TILE = 16
 
 
 class SpriteSheet:
-    """Charge la feuille une fois, extrait les sprites à la volée.
-
-    Pas de découpe sur disque: une vue (subsurface) par sprite, copiée
-    pour rester indépendante de la feuille source.
-    """
+   
 
     def __init__(self, path: str | Path | None = None) -> None:
         if path is None:
@@ -37,9 +31,7 @@ class SpriteSheet:
         return pygame.transform.scale(spr, (size, size))
 
 
-# --- Table de coordonnées ------------------------------------------------
-# x d'origine des tuiles ghost/pacman = 4 (tuile 16 englobant le contenu).
-# Lignes de fantômes: pitch 16px régulier.
+
 GHOST_X0 = 4
 GHOST_ROWS = {
     "blinky": 64,   # rouge
@@ -48,8 +40,7 @@ GHOST_ROWS = {
     "clyde": 112,   # orange
 }
 
-# 8 premières tuiles d'une ligne fantôme = 2 frames x 4 directions.
-# Ordre observé sur la feuille: right, down, left, up (2 frames chacun).
+
 GHOST_DIRS = ("right", "down", "left", "up")
 
 
@@ -64,14 +55,11 @@ def load_ghost(sheet: SpriteSheet,
     return out
 
 
-# Petit Pac-Man directionnel.
-# Origine x=4, pitch 16. Par direction: 2 frames (bouche grande, bouche mi).
-# Le cercle fermé (bouche close) est unique et partagé par toutes les dirs.
+
 PACMAN_X0 = 4
 PACMAN_OPEN_X = (4, 20)        # (grande ouverte, mi-ouverte)
 PACMAN_CLOSED_RECT = (36, 0, TILE, TILE)  # cercle plein partagé
 
-# y de la ligne de chaque direction (mouvement de la bouche).
 PACMAN_ROWS = {
     "right": 0,
     "left": 16,
@@ -81,16 +69,11 @@ PACMAN_ROWS = {
 
 
 def load_pacman_closed(sheet: SpriteSheet) -> pygame.Surface:
-    """Cercle plein (bouche fermée), partagé par toutes les directions."""
     return sheet.at(*PACMAN_CLOSED_RECT)
 
 
 def load_pacman_dir(sheet: SpriteSheet,
                     direction: str) -> list[pygame.Surface]:
-    """Cycle d'anim d'une direction: [fermé, mi-ouvert, grand ouvert].
-
-    Boucler ce cycle (et son retour) donne le chomp classique.
-    """
     y = PACMAN_ROWS[direction]
     closed = load_pacman_closed(sheet)
     half = sheet.at(PACMAN_OPEN_X[1], y)
@@ -129,3 +112,13 @@ def load_frightened(sheet: SpriteSheet) -> dict[str, list[pygame.Surface]]:
     blue = [sheet.at(x, FRIGHT_Y) for x in FRIGHT_BLUE_X]
     white = [sheet.at(x, FRIGHT_Y) for x in FRIGHT_WHITE_X]
     return {"blue": blue, "white": white}
+
+
+# Animation de mort (ligne du haut, y=0) : pacman s'ouvre puis disparaît.
+DEATH_Y = 0
+DEATH_X = (52, 68, 84, 100, 116, 132, 148, 164, 180, 196, 212)
+
+
+def load_death(sheet: SpriteSheet) -> list[pygame.Surface]:
+    """Les 11 frames de l'animation de mort."""
+    return [sheet.at(x, DEATH_Y) for x in DEATH_X]

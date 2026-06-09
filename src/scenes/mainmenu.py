@@ -33,7 +33,8 @@ class MainMenu(Menu):
 
     def start(self) -> None:
         from src.scenes.game import Game
-        self.next_scene = Game(self.fonts, self.screen_rect, self.config)
+        self.next_scene = Game(self.fonts, self.screen_rect, self.config,
+                               self.cheat)
 
     def highscores(self) -> None:
         from src.scenes.highscores import Highscores

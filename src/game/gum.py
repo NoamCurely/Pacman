@@ -52,7 +52,6 @@ class Gum:
             return self.points_pacgum
         if cell in self.super_gum:
             self.super_gum.discard(cell)
-            # self.ghosts.set_frightened()
             return self.points_super
         return 0
 
