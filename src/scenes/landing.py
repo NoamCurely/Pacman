@@ -9,8 +9,12 @@ from src.scenes.scene import Scene, scaled
 class Landing(Scene):
     """Title screen; ENTER moves to the main menu."""
 
-    def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config) -> None:
+    def __init__(
+        self, 
+        fonts: Fonts, 
+        screen_rect: pygame.Rect,
+        config: Config
+    ) -> None:
         super().__init__()
         self.fonts = fonts
         self.screen_rect = screen_rect

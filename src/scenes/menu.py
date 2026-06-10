@@ -11,8 +11,12 @@ from src.scenes.scene import Scene, scaled
 class Menu(Scene):
     """Selectable list of labelled options driven by arrow keys."""
 
-    def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config) -> None:
+    def __init__(
+        self, 
+        fonts: Fonts, 
+        screen_rect: pygame.Rect,
+        config: Config
+    ) -> None:
         super().__init__()
         self.fonts = fonts
         self.screen_rect = screen_rect

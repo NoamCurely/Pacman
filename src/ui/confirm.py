@@ -5,17 +5,20 @@ import pygame
 class ConfirmDialog:
     """Pure drawing helper for a dimmed modal panel; the scene owns state."""
 
-    def __init__(self, title_font: pygame.font.Font,
-                 hint_font: pygame.font.Font,
-                 dim_alpha: int = 200,
-                 panel_color: tuple[int, int, int] = (20, 20, 20),
-                 border_color: str | tuple[int, int, int] = "yellow",
-                 title_color: str | tuple[int, int, int] = "yellow",
-                 hint_color: tuple[int, int, int] = (200, 200, 200),
-                 pad: int = 40,
-                 gap: int = 50,
-                 border_width: int = 3,
-                 radius: int = 12) -> None:
+    def __init__(
+        self,
+        title_font: pygame.font.Font,
+        hint_font: pygame.font.Font,
+        dim_alpha: int = 200,
+        panel_color: tuple[int, int, int] = (20, 20, 20),
+        border_color: str | tuple[int, int, int] = "yellow",
+        title_color: str | tuple[int, int, int] = "yellow",
+        hint_color: tuple[int, int, int] = (200, 200, 200),
+        pad: int = 40,
+        gap: int = 50,
+        border_width: int = 3,
+        radius: int = 12
+    ) -> None:
         self.title_font = title_font
         self.hint_font = hint_font
         self.dim_alpha = dim_alpha
@@ -28,8 +31,13 @@ class ConfirmDialog:
         self.border_width = border_width
         self.radius = radius
 
-    def draw(self, screen: pygame.Surface, rect: pygame.Rect,
-             title: str, hint: str) -> None:
+    def draw(
+        self,
+        screen: pygame.Surface,
+        rect: pygame.Rect,
+        title: str, 
+        hint: str
+    ) -> None:
         """Draw the dim overlay, the panel and the title and hint text."""
         dim = pygame.Surface(rect.size, pygame.SRCALPHA)
         dim.fill((0, 0, 0, self.dim_alpha))

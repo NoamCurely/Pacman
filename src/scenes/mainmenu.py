@@ -9,9 +9,14 @@ from src.scenes.menu import Menu
 class MainMenu(Menu):
     """Main menu; arrows navigate and ENTER selects."""
 
-    def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config, cheat: bool = False,
-                 selected: int = 0) -> None:
+    def __init__(
+        self, 
+        fonts: Fonts, 
+        screen_rect: pygame.Rect,
+        config: Config, 
+        cheat: bool = False,
+        selected: int = 0
+    ) -> None:
         super().__init__(fonts, screen_rect, config)
         self.selected = selected
         self.cheat = cheat

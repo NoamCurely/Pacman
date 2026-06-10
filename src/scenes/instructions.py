@@ -14,8 +14,13 @@ HELP_PATH = Path(__file__).parent / "help.md"
 class Instructions(Menu):
     """Display the controls and rules read from help.md."""
 
-    def __init__(self, fonts: Fonts, screen_rect: pygame.Rect,
-                 config: Config, previous: Scene) -> None:
+    def __init__(
+        self, 
+        fonts: Fonts, 
+        screen_rect: pygame.Rect,
+        config: Config, 
+        previous: Scene
+    ) -> None:
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
         self.start_y = scaled(screen_rect.height, 100)
