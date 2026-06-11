@@ -43,6 +43,9 @@ class Hud:
             'noclip': 'N  - Noclip',
             'frighten': 'F  - Frighten All Ghosts',
             'end': 'G  - End Game',
+            'add_life': 'L - Extra Life',
+            'o': 'O - Reduce Speed',
+            'p': 'P - Increase Speed'
         }
 
         y = panel.top + 40
