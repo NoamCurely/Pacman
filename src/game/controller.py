@@ -5,9 +5,9 @@ from src.game.maze import Maze
 from src.game.directions import DIRECTIONS as VECTORS
 from src.game.spritesheet import SpriteSheet, load_pacman
 
-FRAME_MS = 200
-SPEED = 2.5
-SNAP_THRESHOLD = SPEED + 6
+FRAME_MS    = 200
+SPEED       = 2.5
+SNAP_THRESHOLD  = SPEED + 6
 
 
 class Controller:
@@ -20,6 +20,7 @@ class Controller:
             d: [SpriteSheet.scale(f, 32) for f in fs]
             for d, fs in load_pacman(self.sheet).items()
         }
+        self.cheat_speed = 0
         self.direction = 'right'
         self.queued_dir: str | None = None
         self.frames: list[pygame.Surface] = []
@@ -43,7 +44,8 @@ class Controller:
         self.direction = direction
         self.frames = self.frames_by_dir[direction]
         self.frame_idx = 0
-        self.vel = pygame.Vector2(VECTORS[direction]) * SPEED
+        self.vel = pygame.Vector2(
+                VECTORS[direction]) * (SPEED + self.cheat_speed)
 
     def update(
         self,

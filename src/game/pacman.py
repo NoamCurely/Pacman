@@ -1,4 +1,3 @@
-"""Pacman: the player controller plus its death animation frames."""
 import pygame
 
 from src.game.controller import Controller
@@ -6,7 +5,6 @@ from src.game.spritesheet import SpriteSheet, load_death
 
 
 class Pacman(Controller):
-    """Player entity adding the death animation to the Controller."""
 
     def __init__(self, screen_rect: pygame.Rect) -> None:
         super().__init__(screen_rect)

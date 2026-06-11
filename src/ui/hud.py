@@ -21,7 +21,7 @@ class Hud:
         self.font = fonts.get("Pacmania.otf", size)
         self.cheat_font = fonts.get("Pacmania.otf", 24)
         self.title = fonts.get("Pacmania.otf", 32)
-        self.pac = load_pacman_dir(self.sheet, "right")[2]
+        self.pac = load_pacman_dir(self.sheet, "right")[1]
         self.pac = SpriteSheet.scale(self.pac, 32)
 
     def draw_cheat(
@@ -71,6 +71,9 @@ class Hud:
         ]
         n = len(labels)
         rects = []
+        plus = 0
+        if (lives >= 8):
+            plus = lives - 8
         for i, text in enumerate(labels):
             surf = self.font.render(text, True, TEXT_COLOR)
             cx = area.x + area.width * (2 * i + 1) // (2 * n)
@@ -78,9 +81,14 @@ class Hud:
             screen.blit(surf, rect)
             rects.append(rect)
         lives_rect = rects[1]
-        gap = 18
-        for _ in range(lives):
+        lives_display = lives if lives <= 8 else 8
+        gap = 19
+        for _ in range(lives_display):
             pac_rect = self.pac.get_rect(midright=(
                 gap + lives_rect.right + gap, area.centery + 2))
             screen.blit(self.pac, pac_rect)
-            gap += 20
+            gap += 17
+        if (plus):
+            plus_display = self.font.render(f"+{plus}", True, TEXT_COLOR)
+            rect = plus_display.get_rect(center=(1090, area.centery))
+            screen.blit(plus_display, rect)

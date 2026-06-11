@@ -195,13 +195,26 @@ class Game(Scene):
         self.pacman.handle_event(event)
         if not self.cheat or event.type != pygame.KEYDOWN:
             return
+
+        if event.key == pygame.K_o and self.pacman.cheat_speed > 0:
+            self.pacman.cheat_speed -= 1
+
+        if event.key == pygame.K_p:
+            self.pacman.cheat_speed += 1
+
+        if event.key == pygame.K_l:
+            self.lives += 1
+
         if event.key == pygame.K_i:
             self.invincible = not self.invincible
+
         if event.key == pygame.K_n:
             self.noclip = not self.noclip
+
         if event.key == pygame.K_f:
             for ghost in self.ghosts:
                 ghost.set_frightened()
+
         if event.key == pygame.K_g:
             self.gum.gum.clear()
             self.gum.super_gum.clear()
