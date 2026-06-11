@@ -32,7 +32,7 @@ class Controller:
         )
         self.change_dir('right')
 
-    def handle_event(self, event: pygame.event.Event) -> None:
+    def handle_event(self, event: pygame.event.Event) -> None:  
         """Queue a direction change from a key press."""
         if (event.type == pygame.KEYDOWN):
             if (event.key in self.keymap):
@@ -69,7 +69,9 @@ class Controller:
         if (self.vel.y != 0):
             self.pos.x = cell_cx
 
-        if (self.queued_dir and on_grid):
+        blocked_now = self._blocked(maze, maze_area, self.vel)
+        if self.queued_dir and (on_grid or blocked_now):
+        #if (self.queued_dir and on_grid):
             vx, vy = VECTORS[self.queued_dir]
             cand = pygame.Vector2(vx, vy) * SPEED
             if noclip or not self._blocked(maze, maze_area, cand):
