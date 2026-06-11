@@ -42,7 +42,7 @@ class Hud:
             'invincible': 'I  - Invincible',
             'noclip': 'N  - Noclip',
             'frighten': 'F  - Frighten All Ghosts',
-            'end': 'G  - End Game',
+            'end': 'G  - Skip Level',
             'add_life': 'L - Extra Life',
             'o': 'O - Reduce Speed',
             'p': 'P - Increase Speed'
