@@ -81,7 +81,24 @@ class Controller:
                 self.queued_dir = None
 
         if noclip or not self._blocked(maze, maze_area, self.vel):
-            self.pos += self.vel
+            next_pos    = self.pos + self.vel
+
+            cell_size   = min(maze_area.width // maze.cols,
+                            maze_area.height // maze.rows)
+            offset_x    = maze_area.x + (
+                    maze_area.width - maze.cols * cell_size) // 2
+            offset_y    = maze_area.y + (
+                    maze_area.height - maze.rows * cell_size) // 2
+            
+            min_x   = offset_x + cell_size // 2
+            max_x   = offset_x + maze.cols * cell_size - cell_size // 2
+            min_y   = offset_y + cell_size // 2
+            max_y   = offset_y + maze.rows * cell_size - cell_size // 2
+            
+            next_pos.x = max(min_x, min(max_x, next_pos.x))
+            next_pos.y = max(min_y, min(max_y, next_pos.y))
+
+            self.pos    = next_pos
 
     def _blocked(
         self,

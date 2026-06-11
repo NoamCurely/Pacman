@@ -88,7 +88,7 @@ class Hud:
         gap = 19
         for _ in range(lives_display):
             pac_rect = self.pac.get_rect(midright=(
-                gap + lives_rect.right + gap, area.centery + 2))
+                gap + lives_rect.right + gap, area.centery + 4))
             screen.blit(self.pac, pac_rect)
             gap += 17
         if (plus):
