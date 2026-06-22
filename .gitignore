@@ -13,3 +13,6 @@ ENV/
 # for nixos with niri
 shell.nix
 .envrc
+
+
+highscores.json
