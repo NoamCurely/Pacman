@@ -29,7 +29,8 @@ class Game(Scene):
         self.fonts = fonts
         self.screen_rect = screen_rect
         self.config = config
-        self.cheat = cheat
+        self.cheat  = cheat
+        self.freeze = False
         self.invincible = False
         self.noclip = False
 
@@ -214,6 +215,15 @@ class Game(Scene):
         if event.key == pygame.K_f:
             for ghost in self.ghosts:
                 ghost.set_frightened()
+
+        if event.key == pygame.K_t and not self.freeze:
+            for ghost in self.ghosts:
+                ghost.speed = 0
+                self.freeze = True
+        else:
+            for ghost in self.ghosts:
+                ghost.speed = self.speed
+                self.freeze = False
 
         if event.key == pygame.K_g:
             self.gum.gum.clear()
