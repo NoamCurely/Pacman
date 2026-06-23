@@ -7,8 +7,11 @@ from src.fonts import Fonts
 from src.parsing import Config
 from src.scenes.menu import Menu
 from src.scenes.scene import Scene, scaled
+from pathlib import Path
 
-SAVE_PATH = 'src/saves/highscores.json'
+
+SAVE_DIR    = Path('src/saves')
+SAVE_PATH   = SAVE_DIR / 'highscores.json'
 
 
 class Highscores(Menu):
@@ -28,12 +31,20 @@ class Highscores(Menu):
         self.title = fonts.get("Pacmania.otf", scaled(h, 64))
         self.start_y = scaled(h, 100)
 
+        Highscores.ensure_json()
+
         with open(SAVE_PATH, 'r') as f:
             self.data = loads(f.read())
 
         self.keymap[pygame.K_UP] = self.restrict
         self.keymap[pygame.K_DOWN] = self.restrict
         self.keymap[pygame.K_ESCAPE] = self.back
+
+    @staticmethod
+    def ensure_json() -> None:
+        SAVE_DIR.mkdir(parents=True, exist_ok=True)
+        if not SAVE_PATH.exists():
+            SAVE_PATH.write_text('[]')
 
     def draw(self, screen: pygame.Surface) -> None:
         """Draw the title and the scores sorted high to low."""

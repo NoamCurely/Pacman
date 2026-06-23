@@ -41,6 +41,7 @@ class Hud:
         labels = {
             'invincible': 'I  - Invincible',
             'noclip': 'N  - Noclip',
+            'frozen': 'R    - Freeze All Ghosts',
             'frighten': 'F  - Frighten All Ghosts',
             'end': 'G  - Skip Level',
             'add_life': 'L - Extra Life',

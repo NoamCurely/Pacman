@@ -30,7 +30,6 @@ class Game(Scene):
         self.screen_rect = screen_rect
         self.config = config
         self.cheat  = cheat
-        self.freeze = False
         self.invincible = False
         self.noclip = False
 
@@ -56,6 +55,7 @@ class Game(Scene):
         self.ghost_respawn_at = 0
         self.levels = 0
         self.speed = 2.0
+        self.frozen = False
         self.build_level()
 
         sfx.play("pacman_beginning.wav")
@@ -212,18 +212,14 @@ class Game(Scene):
         if event.key == pygame.K_n:
             self.noclip = not self.noclip
 
+        if event.key == pygame.K_r:
+            for ghost in self.ghosts:
+                ghost.freeze = not self.frozen
+            self.frozen = not self.frozen
+
         if event.key == pygame.K_f:
             for ghost in self.ghosts:
                 ghost.set_frightened()
-
-        if event.key == pygame.K_t and not self.freeze:
-            for ghost in self.ghosts:
-                ghost.speed = 0
-                self.freeze = True
-        else:
-            for ghost in self.ghosts:
-                ghost.speed = self.speed
-                self.freeze = False
 
         if event.key == pygame.K_g:
             self.gum.gum.clear()
@@ -242,8 +238,11 @@ class Game(Scene):
                       self.levels + 1)
         if self.cheat:
             self.hud.draw_cheat(
-                screen, self.cheat_panel,
-                {"invincible": self.invincible, "noclip": self.noclip})
+                screen, self.cheat_panel, {
+                    "invincible": self.invincible,
+                    "noclip": self.noclip,
+                    "frozen": self.frozen,
+                    })
 
         if self.dying:
             idx = min(self.death_idx, len(self.pacman.death_frames) - 1)

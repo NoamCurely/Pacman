@@ -43,6 +43,7 @@ class Ghost:
         self.fright_until = 0
         self.dead = False
         self.dead_until = 0
+        self.freeze = False
 
     def reset(self, area: pygame.Rect) -> None:
         """Move the ghost back to its spawn cell and clear dead state."""
@@ -122,6 +123,10 @@ class Ghost:
         pac_dir: str,
     ) -> None:
         """Advance the ghost: pick a direction at cell centers and move."""
+        if self.freeze:
+            return
+        if self.frightened and pygame.time.get_ticks() >= self.fright_until:
+            self.frightened = False
         if self.dead:
             if pygame.time.get_ticks() >= self.dead_until:
                 self.reset(area)
