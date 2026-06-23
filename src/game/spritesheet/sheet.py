@@ -12,7 +12,11 @@ class SpriteSheet:
     def __init__(self, path: str | Path | None = None) -> None:
         if path is None:
             path = ASSET_DIR / SHEET_NAME
-        self.sheet = pygame.image.load(str(path)).convert_alpha()
+        # The arcade sheet has a solid black background (no real alpha), so
+        # convert() + a black colorkey makes it transparent. convert_alpha()
+        # would give per-pixel alpha, which makes blit ignore the colorkey.
+        self.sheet = pygame.image.load(str(path)).convert()
+        self.sheet.set_colorkey((0, 0, 0))
 
     def at(
         self,

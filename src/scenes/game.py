@@ -148,6 +148,9 @@ class Game(Scene):
             seed=self.config.seed
             )
         self.pacman = Pacman(self.maze_area)
+        sprite_size = max(
+            8, int(self.maze.cell_size(self.maze_area) * 0.9))
+        self.pacman.resize(sprite_size)
         x, y = self.maze.find_open_cell(self.maze_area)
         self.pacman.pos = pygame.Vector2(x, y)
         spawn_cell = self.maze.cell_at(x, y, self.maze_area)
@@ -158,6 +161,7 @@ class Game(Scene):
                        for n in ("blinky", "pinky", "inky", "clyde")]
         self.spawn.random_ghost(self.ghosts)
         for ghost in self.ghosts:
+            ghost.resize(sprite_size)
             ghost.reset(self.maze_area)
 
     def next_level(self) -> None:

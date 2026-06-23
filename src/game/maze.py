@@ -39,20 +39,43 @@ class Maze:
                 west = v & 8
 
                 if north:
-                    pygame.draw.line(screen, WALL_COLOR,
-                                     (left, top), (right, top), WALL_W)
+                    pygame.draw.line(
+                        screen,
+                        WALL_COLOR,
+                        (left, top),
+                        (right, top), 
+                        WALL_W
+                    )
                 if east:
-                    pygame.draw.line(screen, WALL_COLOR,
-                                     (right, top), (right, bottom), WALL_W)
+                    pygame.draw.line(
+                        screen,
+                        WALL_COLOR,
+                        (right, top),
+                        (right, bottom),
+                        WALL_W
+                    )
                 if south:
-                    pygame.draw.line(screen, WALL_COLOR,
-                                     (left, bottom), (right, bottom), WALL_W)
+                    pygame.draw.line(
+                        screen,
+                        WALL_COLOR,
+                        (left, bottom),
+                        (right, bottom),
+                        WALL_W
+                    )
                 if west:
-                    pygame.draw.line(screen, WALL_COLOR,
-                                     (left, top), (left, bottom), WALL_W)
+                    pygame.draw.line(
+                        screen,
+                        WALL_COLOR,
+                        (left, top),
+                        (left, bottom),
+                        WALL_W
+                    )
                 if v == 15:
-                    pygame.draw.rect(screen, (60, 90, 200),
-                                     (left, top, cell_size, cell_size))
+                    pygame.draw.rect(
+                        screen,
+                        (60, 90, 200),
+                        (left, top, cell_size, cell_size)
+                    )
 
     def _geometry(self, area: pygame.Rect) -> tuple[int, int, int]:
         """Return (cell_size, offset_x, offset_y) for the draw area."""
@@ -107,7 +130,7 @@ class Maze:
         """Return True if moving by (dx, dy) from (px, py) hits a wall."""
         col0, row0 = self.cell_at(px, py, area)
 
-        margin = self.cell_size(area) // 3
+        margin = 4
         nx = px + dx + (margin if dx > 0 else -margin if dx < 0 else 0)
         ny = py + dy + (margin if dy > 0 else -margin if dy < 0 else 0)
         col1, row1 = self.cell_at(nx, ny, area)

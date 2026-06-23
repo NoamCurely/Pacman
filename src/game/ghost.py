@@ -1,5 +1,4 @@
 """Ghost entity: pathfinding, chase/flee behaviour and rendering."""
-import heapq
 import random
 import pygame
 
@@ -24,26 +23,35 @@ class Ghost:
         self.speed = speed
         self.sheet = SpriteSheet()
         self.algo = Algo
-        raw = load_ghost(self.sheet, name)
-        self.frames = {
-            d: [SpriteSheet.scale(f, GHOST_SIZE) for f in fs]
-            for d, fs in raw.items()
-        }
-        fr = load_frightened(self.sheet)
-        self.fright = {
-            k: [SpriteSheet.scale(f, GHOST_SIZE) for f in fs]
-            for k, fs in fr.items()
-        }
+        self._raw_frames = load_ghost(self.sheet, name)
+        self._raw_fright = load_frightened(self.sheet)
+        self.frames: dict[str, list[pygame.Surface]] = {}
+        self.fright: dict[str, list[pygame.Surface]] = {}
+        self.size = GHOST_SIZE
+        self.resize(GHOST_SIZE)
         self.direction = "right"
         self.frame_idx = 0
         self.spawn_cell: Cell = (0, 0)
         self.pos = pygame.Vector2(0, 0)
         self.dir: Cell = (0, 0)
+        self._last_cell: Cell | None = None
         self.frightened = False
         self.fright_until = 0
         self.dead = False
         self.dead_until = 0
         self.freeze = False
+
+    def resize(self, size: int) -> None:
+        """Rescale ghost sprites to the given pixel size (one maze cell)."""
+        self.size = size
+        self.frames = {
+            d: [SpriteSheet.scale(f, size) for f in fs]
+            for d, fs in self._raw_frames.items()
+        }
+        self.fright = {
+            k: [SpriteSheet.scale(f, size) for f in fs]
+            for k, fs in self._raw_fright.items()
+        }
 
     def reset(self, area: pygame.Rect) -> None:
         """Move the ghost back to its spawn cell and clear dead state."""
@@ -52,6 +60,7 @@ class Ghost:
         self.dead = False
         self.dead_until = 0
         self.dir = (0, 0)
+        self._last_cell = None
 
     def set_frightened(self, duration_ms: int = 7000) -> None:
         """Make the ghost edible for the given duration."""
@@ -137,10 +146,13 @@ class Ghost:
             *maze.cell_at(self.pos.x, self.pos.y, area), area)
         center = (abs(self.pos.x - cx) < self.speed
                   and abs(self.pos.y - cy) < self.speed)
+        ghost_cell = maze.cell_at(self.pos.x, self.pos.y, area)
 
-        if center:
+        # Re-decide at every cell center, and also whenever stopped, so a
+        # ghost can never get stuck: dir=(0,0) is not a terminal state.
+        if center and (ghost_cell != self._last_cell or self.dir == (0, 0)):
             self.pos.update(cx, cy)
-            ghost_cell = maze.cell_at(self.pos.x, self.pos.y, area)
+            self._last_cell = ghost_cell
             if self.frightened:
                 choice = self.flee_dir(area)
             else:
@@ -148,6 +160,11 @@ class Ghost:
                 choice = self.astar_dir(maze, area, ghost_cell, goal)
                 if choice is None:
                     choice = self.astar_dir(maze, area, ghost_cell, pac_cell)
+            # astar returns no step when the ghost sits on its target (e.g.
+            # on top of an invincible Pacman); keep roaming via any open exit
+            # instead of freezing forever.
+            if choice is None:
+                choice = self.flee_dir(area)
             if choice is not None:
                 self.direction = choice
                 self.dir = DIRS[choice]
