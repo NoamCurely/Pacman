@@ -148,8 +148,6 @@ class Ghost:
                   and abs(self.pos.y - cy) < self.speed)
         ghost_cell = maze.cell_at(self.pos.x, self.pos.y, area)
 
-        # Re-decide at every cell center, and also whenever stopped, so a
-        # ghost can never get stuck: dir=(0,0) is not a terminal state.
         if center and (ghost_cell != self._last_cell or self.dir == (0, 0)):
             self.pos.update(cx, cy)
             self._last_cell = ghost_cell
@@ -160,9 +158,7 @@ class Ghost:
                 choice = self.astar_dir(maze, area, ghost_cell, goal)
                 if choice is None:
                     choice = self.astar_dir(maze, area, ghost_cell, pac_cell)
-            # astar returns no step when the ghost sits on its target (e.g.
-            # on top of an invincible Pacman); keep roaming via any open exit
-            # instead of freezing forever.
+
             if choice is None:
                 choice = self.flee_dir(area)
             if choice is not None:

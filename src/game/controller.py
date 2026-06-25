@@ -120,9 +120,6 @@ class Controller:
         vel: pygame.Vector2
     ) -> bool:
         """Return True if moving by vel would push a corner into a wall."""
-        # Clamp the collision box so half + look-ahead margin stays under
-        # half a cell; otherwise Pacman parks off-center near walls and can
-        # never align to turn (wedges on smaller cells / bigger sprites).
         cell = maze.cell_size(maze_area)
         half = max(2, min(self.sprite_size // 2 - 1, cell // 2 - 5))
         corners = [
