@@ -12,8 +12,8 @@ class Menu(Scene):
     """Selectable list of labelled options driven by arrow keys."""
 
     def __init__(
-        self, 
-        fonts: Fonts, 
+        self,
+        fonts: Fonts,
         screen_rect: pygame.Rect,
         config: Config
     ) -> None:

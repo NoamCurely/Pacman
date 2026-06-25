@@ -43,7 +43,7 @@ class Maze:
                         screen,
                         WALL_COLOR,
                         (left, top),
-                        (right, top), 
+                        (right, top),
                         WALL_W
                     )
                 if east:

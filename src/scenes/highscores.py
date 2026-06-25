@@ -10,8 +10,8 @@ from src.scenes.scene import Scene, scaled
 from pathlib import Path
 
 
-SAVE_DIR    = Path('src/saves')
-SAVE_PATH   = SAVE_DIR / 'highscores.json'
+SAVE_DIR = Path('src/saves')
+SAVE_PATH = SAVE_DIR / 'highscores.json'
 
 
 class Highscores(Menu):

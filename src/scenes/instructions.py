@@ -15,17 +15,20 @@ class Instructions(Menu):
     """Display the controls and rules read from help.md."""
 
     def __init__(
-        self, 
-        fonts: Fonts, 
+        self,
+        fonts: Fonts,
         screen_rect: pygame.Rect,
-        config: Config, 
+        config: Config,
         previous: Scene
     ) -> None:
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
         self.start_y = scaled(screen_rect.height, 50)
-        self.help_font = fonts.get("Pacmania.otf", scaled(screen_rect.height, 28))
-        self.lines  = []
+        self.help_font = fonts.get(
+            "Pacmania.otf",
+            scaled(screen_rect.height, 28)
+        )
+        self.lines: list[str] = []
 
         try:
             with open(HELP_PATH, 'r') as f:

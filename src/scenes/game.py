@@ -29,7 +29,7 @@ class Game(Scene):
         self.fonts = fonts
         self.screen_rect = screen_rect
         self.config = config
-        self.cheat  = cheat
+        self.cheat = cheat
         self.invincible = False
         self.noclip = False
 

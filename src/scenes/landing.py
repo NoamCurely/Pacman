@@ -10,8 +10,8 @@ class Landing(Scene):
     """Title screen; ENTER moves to the main menu."""
 
     def __init__(
-        self, 
-        fonts: Fonts, 
+        self,
+        fonts: Fonts,
         screen_rect: pygame.Rect,
         config: Config
     ) -> None:

@@ -24,11 +24,11 @@ clean:
 	rm -rf data/output/*.json
 
 lint: install
-	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk; \
+	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk,.cache; \
 	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict: install
-	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk
+	@uv run flake8 . --exclude=.venv,__pycache__,llm_sdk,.cache;
 	@uv run mypy . --strict
 
 re: clean run

@@ -43,7 +43,7 @@ class Controller:
         self.frames = self.frames_by_dir[self.direction]
         self.frame_idx = 0
 
-    def handle_event(self, event: pygame.event.Event) -> None:  
+    def handle_event(self, event: pygame.event.Event) -> None:
         """Queue a direction change from a key press."""
         if (event.type == pygame.KEYDOWN):
             if (event.key in self.keymap):
@@ -73,7 +73,7 @@ class Controller:
         cell_cx, cell_cy = maze.cell_center(col, row, maze_area)
 
         on_grid = (abs(self.pos.x - cell_cx) <= SNAP_THRESHOLD and
-            abs(self.pos.y - cell_cy) <= SNAP_THRESHOLD)
+                   abs(self.pos.y - cell_cy) <= SNAP_THRESHOLD)
 
         if (self.vel.x != 0):
             self.pos.y = cell_cy
@@ -90,7 +90,7 @@ class Controller:
                 self.queued_dir = None
 
         if noclip or not self._blocked(maze, maze_area, self.vel):
-            next_pos    = self.pos + self.vel
+            next_pos = self.pos + self.vel
 
             cell_size = min(
                 maze_area.width // maze.cols,
@@ -102,12 +102,12 @@ class Controller:
             offset_y = maze_area.y + (
                 maze_area.height - maze.rows * cell_size
                 ) // 2
-            
+
             min_x = offset_x + cell_size // 2
             max_x = offset_x + maze.cols * cell_size - cell_size // 2
             min_y = offset_y + cell_size // 2
             max_y = offset_y + maze.rows * cell_size - cell_size // 2
-            
+
             next_pos.x = max(min_x, min(max_x, next_pos.x))
             next_pos.y = max(min_y, min(max_y, next_pos.y))
 

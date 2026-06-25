@@ -10,10 +10,10 @@ class MainMenu(Menu):
     """Main menu; arrows navigate and ENTER selects."""
 
     def __init__(
-        self, 
-        fonts: Fonts, 
+        self,
+        fonts: Fonts,
         screen_rect: pygame.Rect,
-        config: Config, 
+        config: Config,
         cheat: bool = False,
         selected: int = 0
     ) -> None:

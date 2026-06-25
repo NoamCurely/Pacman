@@ -13,10 +13,10 @@ class NameEntry(Scene):
     MAX_LEN = 12
 
     def __init__(
-        self, 
-        fonts: Fonts, 
+        self,
+        fonts: Fonts,
         screen_rect: pygame.Rect,
-        config: Config, 
+        config: Config,
         score: int
     ) -> None:
         super().__init__()

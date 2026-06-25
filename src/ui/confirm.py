@@ -35,7 +35,7 @@ class ConfirmDialog:
         self,
         screen: pygame.Surface,
         rect: pygame.Rect,
-        title: str, 
+        title: str,
         hint: str
     ) -> None:
         """Draw the dim overlay, the panel and the title and hint text."""
