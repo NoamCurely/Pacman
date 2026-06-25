@@ -2,6 +2,7 @@ export	UV_CACHE_DIR	= .cache/uv
 export	PIP_CACHE_DIR	= .cache/pip
 
 VENV	= .venv
+CACHE	= .cache
 PAC	= ./pac-man.py
 ARGS	= $(filter-out $@, $(MAKECMDGOALS))
 PDB	= pudb
@@ -21,6 +22,7 @@ clean:
 	@find . -type d -name __pycache__ -exec rm -rf {} +; \
 	find . -type d -name .mypy_cache -exec rm -rf {} +; \
 	rm -rf $(VENV); \
+	rm -rf $(CACHE); \
 	rm -rf data/output/*.json
 
 lint: install
