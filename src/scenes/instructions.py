@@ -23,9 +23,9 @@ class Instructions(Menu):
     ) -> None:
         super().__init__(fonts, screen_rect, config)
         self.previous = previous
-        self.start_y = scaled(screen_rect.height, 100)
-
-        self.lines = ['HELP']
+        self.start_y = scaled(screen_rect.height, 50)
+        self.help_font = fonts.get("Pacmania.otf", scaled(screen_rect.height, 28))
+        self.lines  = []
 
         try:
             with open(HELP_PATH, 'r') as f:
@@ -39,18 +39,14 @@ class Instructions(Menu):
 
     def draw(self, screen: pygame.Surface) -> None:
         """Draw each help line, highlighting the header."""
+        txt_color = 'WHITE'
         line_height = self.font.get_linesize()
         screen.fill('black')
-        txt_color = 'GREY'
         for i, line in enumerate(self.lines):
-            if (line == 'HELP'):
-                txt_color = 'WHITE'
-
-            surf = self.font.render(line.strip(), True, txt_color)
+            surf = self.help_font.render(line.strip(), True, txt_color)
             rect = surf.get_rect(center=(self.screen_rect.centerx,
                                          self.start_y + i * line_height))
             screen.blit(surf, rect)
-            txt_color = 'GREY'
 
     def back(self) -> None:
         """Return to the previous scene."""
