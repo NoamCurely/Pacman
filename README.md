@@ -130,5 +130,3 @@ See the `Implementation` section for details about modules and classes.
 # Project Management
 
 To finalize the project, we used a mutual git repository and Discord to communicate, though the work has been done at school most of the time. We were able to work on separate parts of the project at the same time which caused no merge issues and agreed on which file each person should work on.
-
-[- Pac-man git repo](https://github.com/nocurely/pacman)
