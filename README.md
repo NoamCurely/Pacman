@@ -16,7 +16,7 @@ make lint # make lint-strict
 make run ./config.json # make debug ./config.json
 ```
 
-Once inside the program, you may toggle on and off by navigating to the cheat button and pressing the enter key.
+Once inside the program, you may toggle cheat mode on and off by navigating to the cheat button and pressing the enter key.
 
 ```txt
 # current cheats
