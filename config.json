@@ -2,7 +2,7 @@
 # Lines starting with # are comments and are ignored by parser
 
 {
-  "highscore_filename": "data/output/highscores.json",
+  "highscore_filename": "src/saves/highscores.json",
   "lives": 3,
   "pacgum": 42,
   "points_per_pacgum": 10,
