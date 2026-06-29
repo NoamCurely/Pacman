@@ -82,11 +82,15 @@ The mazes are generated using the package provided by the project itself. You ca
 
 The package is also provided as a wheel file: `./mazegenerator-2.0.2-py3-none-any.whl`
 
-It is left untouched. You may use the following commands to extract and compare:
+It is mostly left untouched save for `mazegenerator.py`. You may use the following commands to extract and compare:
 
 ```txt
 unzip ./mazegenerator-2.0.2-py3-none-any.whl -d mazegenerator-2
-diff -rq ./mazegenerator ./mazegenerator-2
+echo
+diff -rq ./mazegenerator ./mazegenerator-2/mazegenerator
+echo
+diff -rq ./mazegenerator-2.0.2.dist-info ./mazegenerator-2/mazegenerator-2.0.2.dist-info
+rm -rf ./mazegenerator-2
 ```
 
 A maze is generated when the player first enters `START GAME`, then it is generated for each level after this one. It's a simple call that is then translated into a pygame surface and blitted onto the screen.
